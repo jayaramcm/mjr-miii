@@ -61,7 +61,7 @@
     document.documentElement.classList.remove('nav-probe');
     let look = 'light';
     for (const el of stack) {
-      if (nav.contains(el) || el.closest('.ab-switch, .preloader') || !visible(el)) continue;
+      if (nav.contains(el) || el.closest('.preloader') || !visible(el)) continue;
       const l = navLook(el);
       if (l) { look = l; break; }
     }
@@ -167,23 +167,6 @@
   if (document.readyState === 'complete') firstReveal();
   else window.addEventListener('load', firstReveal, { once: true });
   setTimeout(firstReveal, 8000); // never hold the page hostage to a slow asset
-
-  // navy or ivory, compared with the switch at the bottom right
-  const loaderButtons = [...document.querySelectorAll('[data-loader]')];
-  const setLoaderLook = (look) => {
-    loader.classList.toggle('preloader--ivory', look === 'ivory');
-    loaderButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.loader === look)));
-    try { localStorage.setItem('mjrLoader', look); } catch (e) { /* storage unavailable */ }
-  };
-  loaderButtons.forEach((b) => b.addEventListener('click', () => {
-    setLoaderLook(b.dataset.loader);
-    // preview it over the page
-    showLoader();
-    setTimeout(hideLoader, 2400);
-  }));
-  let savedLoader = 'navy';
-  try { savedLoader = localStorage.getItem('mjrLoader') || 'navy'; } catch (e) { /* storage unavailable */ }
-  setLoaderLook(savedLoader);
 
   /* ---------- Ink bleed (Cartier-style scroll transition) ----------
      Ivory blots open from staggered seeds, grow and merge until the frame
@@ -293,30 +276,7 @@
   if (reduceMotion.matches) { video.removeAttribute('autoplay'); video.pause(); setPaused(true); }
   else video.play().catch(() => setPaused(true));
 
-  /* ---------- Hero design compare (A: video, B: day/night stills) ---------- */
-  const abButtons = [...document.querySelectorAll('.ab-switch [data-ab]')];
-  const setDesign = (d) => {
-    body.classList.toggle('hero-b', d === 'b');
-    abButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ab === d)));
-    // the video only runs while design A shows it
-    if (d === 'b') video.pause();
-    else if (toggle.getAttribute('aria-pressed') !== 'true') video.play().catch(() => {});
-    try { localStorage.setItem('mjrHero', d); } catch (e) { /* storage unavailable */ }
-  };
-  abButtons.forEach((b) => b.addEventListener('click', () => setDesign(b.dataset.ab)));
-  let savedDesign = 'b';
-  try { savedDesign = localStorage.getItem('mjrHero') || 'b'; } catch (e) { /* storage unavailable */ }
-  setDesign(savedDesign);
-
-  /* ---------- Day / night stills (design B) ---------- */
-  const dayNight = document.getElementById('heroDayNight');
-  dayNight.addEventListener('click', () => {
-    const night = hero.classList.toggle('is-night');
-    dayNight.setAttribute('aria-pressed', String(night));
-    dayNight.setAttribute('aria-label', night ? 'Show the township by day' : 'Show the township by night');
-  });
-
-  /* ---------- Dialog helpers (animated open/close) ---------- */
+/* ---------- Dialog helpers (animated open/close) ---------- */
   const openDialog = (dlg) => {
     lenis && lenis.stop();
     dlg.showModal();
@@ -474,8 +434,8 @@
     const overlay = photo.querySelector('.intro__overlay');
     const word = document.querySelector('.intro__word');
     const wordInner = document.querySelector('.intro__word-inner');
-    const card = document.querySelector('.intro__card:not(.intro__card--stats)');
-    const stats = document.querySelector('.intro__card--stats');
+    const logo = document.querySelector('.intro__logo');
+    const facts = document.querySelectorAll('.intro__facts li');
 
     // Initial setup
     gsap.set(intro, { opacity: 0 });
@@ -491,20 +451,11 @@
     });
     gsap.set(wordInner, {
       opacity: 0,
-      scale: 0.95,
+      scale: 1.25,
       letterSpacing: '0px',
     });
-    gsap.set([card, stats], {
-      left: '50%',
-      top: '50%',
-      xPercent: -50,
-      yPercent: -50,
-      y: () => window.innerHeight * 1.15,
-      rotationX: 24,
-      rotationZ: -7,
-      scale: 0.88,
-      transformPerspective: 1200,
-    });
+    gsap.set(logo, { opacity: 0, scale: 1.3 });
+    gsap.set(facts, { opacity: 0, y: 24 });
 
     const inkTracker = { val: 0 };
 
@@ -546,18 +497,14 @@
       .to(wordInner, { opacity: 1, scale: 1.0, duration: 0.08, ease: 'power2.out' }, 0.58)
       .addLabel('introducing', 0.66)
 
-      // Township card slides up over the word
-      .to(card, {
-        y: 0, rotationX: 0, rotationZ: 0, scale: 1,
-        duration: 0.20, ease: 'power2.out',
-      }, 0.66)
+      // The word scales down further and fades out
+      .to(wordInner, { opacity: 0, scale: 0.8, duration: 0.10, ease: 'power2.in' }, 0.68)
 
-      // Stats card slides up and stacks on the Township card; the first card eases back for depth
-      .to(card, { y: -56, scale: 0.94, duration: 0.18, ease: 'power2.out' }, 0.86)
-      .to(stats, {
-        y: 14, rotationX: 0, rotationZ: 0, scale: 1,
-        duration: 0.20, ease: 'power2.out',
-      }, 0.86)
+      // Township logo scales down into place as it fades in
+      .to(logo, { opacity: 1, scale: 1, duration: 0.14, ease: 'power2.out' }, 0.76)
+
+      // Facts rise in below the logo, one after another
+      .to(facts, { opacity: 1, y: 0, stagger: 0.04, duration: 0.10, ease: 'power2.out' }, 0.88)
 
       // Hold before unpinning into #overview
       .to({}, { duration: 0.14 });
@@ -678,6 +625,9 @@
               }
             }
 
+            // Card has settled: run the tile wave once
+            if (self.progress >= whyTl.labels.plan / whyTl.duration()) explorer.tease && explorer.tease();
+
             // Scrolling back before the card settled closes the explorer cleanly
             if (self.progress < 0.74) {
               explorer.reset(true);
@@ -742,6 +692,7 @@
           duration: 1.2, ease: 'power2.out',
         }, 'cl')
         .addLabel('plan')
+        .call(() => explorer.tease && explorer.tease())
         // Hold so the visitor can explore before the section unpins
         .to({}, { duration: 4.5 });
 
@@ -1135,6 +1086,7 @@
     document.getElementById('ppClose').addEventListener('click', closePop);
 
     const explore = () => {
+      document.getElementById('exploreBtn').classList.remove('is-glowing');
       card.classList.add('is-flipped');
       mplan.classList.add('is-exploring');
       updatePins();
@@ -1266,8 +1218,71 @@
       if (e.key === 'Escape' && !pop.hidden && filterPanel.hidden) closePop();
     });
 
+    /* First arrival: the number tiles flip up like dominoes, row by row down
+       the plan, then flip back the same way; the Explore button then glows
+       until it is clicked */
+    const exploreBtn = document.getElementById('exploreBtn');
+    let teased = false;
+    const tease = () => {
+      if (teased || card.classList.contains('is-flipped')) return;
+      teased = true;
+      if (reduceMotion.matches) { exploreBtn.classList.add('is-glowing'); return; }
+
+      // Pin the tiles in place with GSAP transforms while the stage is still
+      const curX = gsap.getProperty(stage, 'x') || 0;
+      const curY = gsap.getProperty(stage, 'y') || 0;
+      const curScale = gsap.getProperty(stage, 'scaleX') || 1;
+      const sW = W() * curScale;
+      const sH = H() * curScale;
+      const tiles = data.list.map((p) => pins[p.n]);
+      data.list.forEach((p) => {
+        pins[p.n].style.transform = '';
+        gsap.set(pins[p.n], {
+          x: curX + p.px * sW, y: curY + p.py * sH, xPercent: -50, yPercent: -50,
+          rotationX: 0, transformPerspective: 2400, transformOrigin: '50% 50%', force3D: false,
+        });
+      });
+      mplan.classList.add('is-teasing');
+
+      // Group tiles into columns by their position across the plan, left to right
+      const colOf = (p) => Math.round(p.px * 40);
+      const cols = [...new Set(data.list.map(colOf))].sort((a, b) => a - b);
+
+      // Left to right the tiles turn in from edge-on to their numbers; right to
+      // left they turn on to a plain white back (swapped at the edge-on moment,
+      // so the number never shows mirrored); then they all fade out together
+      gsap.set(tiles, { rotationY: -90, opacity: 0 });
+      const tl = gsap.timeline({ onComplete: () => {
+        mplan.classList.remove('is-teasing');
+        if (!card.classList.contains('is-flipped')) exploreBtn.classList.add('is-glowing');
+        // wait for the pin layer to fade away before restoring the tiles
+        setTimeout(() => {
+          tiles.forEach((t) => t.classList.remove('is-back'));
+          gsap.set(tiles, { clearProps: 'transform,opacity' });
+          updatePins();
+        }, 600);
+      } });
+      const STEP = 0.07;
+      const last = cols.length - 1;
+      const backAt = 0.3 + last * STEP + 0.35 + 0.6; // after every tile shows its number, plus a hold
+      data.list.forEach((p) => {
+        const t = pins[p.n];
+        const c = cols.indexOf(colOf(p));
+        const inAt = 0.3 + c * STEP;
+        const outAt = backAt + (last - c) * STEP;
+        tl.to(t, { rotationY: 0, duration: 0.35, ease: 'sine.out' }, inAt)
+          .to(t, { opacity: 1, duration: 0.1, ease: 'none' }, inAt)
+          .to(t, { rotationY: 90, duration: 0.3, ease: 'sine.in' }, outAt)
+          .call(() => t.classList.add('is-back'), null, outAt + 0.3)
+          .to(t, { rotationY: 180, duration: 0.3, ease: 'sine.out' }, outAt + 0.3);
+      });
+      tl.to(tiles, { opacity: 0, duration: 0.5, ease: 'power1.out' }, backAt + last * STEP + 0.6 + 0.4);
+    };
+    exploreBtn.addEventListener('click', () => exploreBtn.classList.remove('is-glowing'));
+
     renderGrid();
     return {
+      tease,
       reset,
       closePop,
       expand,

@@ -239,7 +239,7 @@
   // Fit the photo so heading, photo and caption share one screen
   const fitFrame = () => {
     const room = vh() - NAV_CLEAR - head.offsetHeight - copy.offsetHeight - vh() * 0.07 - 40;
-    const w = Math.max(200, Math.min(window.innerWidth * (isPhone() ? 0.88 : 0.53), 1018, room * 1018 / 558));
+    const w = Math.max(200, Math.min(window.innerWidth * (isPhone() ? 0.88 : 0.62), 1240, room * 1018 / 558));
     frame.style.width = w + 'px';
     frame.style.height = w * 558 / 1018 + 'px';
   };

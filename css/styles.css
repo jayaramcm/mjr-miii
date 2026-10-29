@@ -673,211 +673,12 @@ body.is-scrolling .hero__video {
   transition: none;
 }
 
-/* ---------- Hero design B: day/night stills ----------
-   B hides the video, eyebrow, CTAs, facts and motion control; the two stills
-   fill the hero from the top edge at full width and cross-fade. */
-.hero__stills {
-  display: none;
-}
-
-body.hero-b .hero__video,
-body.hero-b .hero__eyebrow,
-body.hero-b .hero__ctas,
-body.hero-b .hero__facts,
-body.hero-b .hero__motion {
-  display: none;
-}
-
-body.hero-b .hero__stills {
-  display: block;
-  position: absolute;
-  inset: 0;
-  transform: scale(calc(1.06 - var(--intro, 0) * 0.06 + var(--hp, 0) * 0.08));
-  transform-origin: 50% 0;
-  transition: transform 2.6s var(--ease-out);
-}
-
-body.hero-b.is-loaded .hero__stills {
-  --intro: 1;
-}
-
-body.hero-b.is-scrolling .hero__stills {
-  transition: none;
-}
-
-.hero__still {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 0;
-  transition: opacity 1.1s var(--ease-lux);
-}
-
-.hero__still--night {
-  opacity: 0;
-}
-
-/* Day still: a 30% navy gradient behind the title and caption, fading out by
-   mid-screen; it lifts away with the night still */
-.hero__stills::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(29, 40, 86, 0.3) 0%, rgba(29, 40, 86, 0.3) 35%, rgba(29, 40, 86, 0) 65%);
-  transition: opacity 1.1s var(--ease-lux);
-  pointer-events: none;
-}
-
-.hero.is-night .hero__stills::after {
-  opacity: 0;
-}
-
-.hero.is-night .hero__still--night {
-  opacity: 1;
-}
-
-/* By day ——— By night: the lit label is the one showing; the line fades
-   from it toward the other */
-.hero__dn {
-  display: none;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 0.5rem 0;
-  border: 0;
-  background: none;
-  font: 600 0.78rem / 1 var(--f-ui);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ivory);
-  cursor: pointer;
-}
-
-body.hero-b .hero__dn {
-  display: inline-flex;
-}
-
-.hero__dn-day,
-.hero__dn-night {
-  transition: opacity 0.5s;
-}
-
-.hero__dn-night {
-  opacity: 0.45;
-}
-
-.hero.is-night .hero__dn-day {
-  opacity: 0.45;
-}
-
-.hero.is-night .hero__dn-night {
-  opacity: 1;
-}
-
-.hero__dn-line {
-  width: clamp(80px, 8vw, 140px);
-  height: 1px;
-  background: linear-gradient(90deg, rgba(245, 241, 232, 0.95), rgba(245, 241, 232, 0.15));
-  transition: transform 0.6s var(--ease-lux);
-}
-
-.hero.is-night .hero__dn-line {
-  transform: scaleX(-1);
-}
-
-.hero__dn:hover .hero__dn-line {
-  width: clamp(90px, 9vw, 160px);
-}
-
-.hero__dn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 6px;
-}
-
-/* B: smaller title, the caption in two lines, no text shadow or shade */
-body.hero-b .hero__title {
-  font-size: calc(clamp(2.2rem, 4.8vw, 4.3rem) - 8px);
-}
-
-body.hero-b .hero__lede {
-  max-width: 46rem;
-  text-wrap: balance;
-}
-
-body.hero-b .hero__content {
-  text-shadow: none;
-}
-
-body.hero-b .hero__shade {
-  display: none;
-}
-
-/* B: only the scroll cue remains, centred on the bottom edge */
-body.hero-b .hero__base {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  padding: 0 0 clamp(1.25rem, 3vh, 2rem);
-  border-top: 0;
-}
-
-/* A / B compare switch, bottom right */
-.ab-switch {
-  position: fixed;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 60;
-  display: flex;
-  border: 1px solid rgba(202, 152, 44, 0.8);
-  background: rgba(29, 40, 86, 0.85);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-
-.ab-switch button {
-  width: 40px;
-  height: 36px;
-  border: 0;
-  background: none;
-  font: 400 1rem / 1 var(--f-display);
-  color: var(--ivory);
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.ab-switch button[aria-pressed="true"] {
-  background: var(--gold);
-  color: var(--navy-900);
-}
-
-/* Second compare group sits above the A/B buttons */
-.ab-switch--loader {
-  bottom: calc(1.25rem + 46px);
-}
-
-.ab-swatch {
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin: auto;
-  border: 1px solid rgba(245, 241, 232, 0.6);
-}
-
-.ab-swatch--navy { background: var(--navy-900); }
-.ab-swatch--ivory { background: var(--ivory); }
-
 /* ---------- Preloader ----------
    Towers rise, letters settle, the gold cornerstone drops in, on a shared
-   3.6s loop. Navy by default, .preloader--ivory for the light version. */
+   3.6s loop. Ivory background, navy letters. */
 .preloader {
-  --pl-bg: var(--navy-900);
-  --pl-ink: var(--ivory);
+  --pl-bg: var(--ivory);
+  --pl-ink: var(--navy-900);
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -885,11 +686,6 @@ body.hero-b .hero__base {
   place-items: center;
   background: var(--pl-bg);
   transition: opacity 0.7s cubic-bezier(0.65, 0, 0.35, 1), visibility 0s linear 0s;
-}
-
-.preloader--ivory {
-  --pl-bg: var(--ivory);
-  --pl-ink: var(--navy-900);
 }
 
 .preloader svg {
@@ -1268,7 +1064,7 @@ body.is-scrolling .hero__content {
   inset: 0;
   z-index: 2;
   opacity: 0;
-  background: radial-gradient(ellipse at 50% 48%, rgba(29, 40, 86, 0.36) 0%, rgba(12, 12, 12, 0.72) 100%);
+  background: radial-gradient(ellipse at 50% 48%, rgba(8, 8, 10, 0.62) 0%, rgba(8, 8, 10, 0.85) 100%);
   pointer-events: none;
 }
 
@@ -1299,43 +1095,62 @@ body.is-scrolling .hero__content {
   will-change: transform, opacity;
 }
 
-.intro__card {
+.intro__brand {
   position: absolute;
   z-index: 5;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(90vw, 860px);
-  aspect-ratio: 800 / 500;
-  overflow: hidden;
-  /* square corners with a fine stroke just outside the edge */
-  outline: 1.5px solid rgba(72, 72, 72, 0.6);
-  box-shadow:
-    0 18px 40px -16px rgba(12, 12, 12, 0.35),
-    0 4px 12px -4px rgba(12, 12, 12, 0.18);
-  transform-origin: center bottom;
-  will-change: transform;
-}
-
-.intro__card--stats {
-  z-index: 6;
-}
-
-/* Inner stroke: a fine keyline set in from the edge */
-.intro__card::after {
-  content: "";
-  position: absolute;
-  /* 2.33% of the card width: about 20px on desktop, matching the dash clip in Township-stats-Card.svg */
-  inset: calc(min(90vw, 860px) * 0.0233);
-  border: 2px solid rgba(72, 72, 72, 0.6);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 5vh, 3.5rem);
+  padding: 0 16px;
   pointer-events: none;
 }
 
-.intro__card img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
+.intro__logo {
+  width: min(82vw, 620px);
+  height: auto;
+  will-change: transform, opacity;
+}
+
+.intro__facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #fff;
+  text-align: center;
+}
+
+.intro__facts li {
+  display: grid;
+  gap: 0.3rem;
+  padding-left: clamp(1.5rem, 4vw, 4rem);
+  border-left: 1px solid #fff;
+}
+
+.intro__facts li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.intro__facts strong {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+.intro__facts span {
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
 }
 
 
@@ -1629,6 +1444,26 @@ body.is-scrolling .hero__content {
   transition: opacity 0.6s var(--ease-out) 0.35s, visibility 0s;
 }
 
+/* Tile wave on arrival: pins shown but not clickable, flipped in 3D */
+.mplan.is-teasing .mplan__pins {
+  opacity: 1;
+  visibility: visible;
+  transition: none;
+  perspective: 600px;
+}
+
+.mplan.is-teasing .pin {
+  pointer-events: none;
+  transition: none;
+}
+
+/* Back of a tile during the wave: plain white, no number */
+.mplan.is-teasing .pin.is-back {
+  background: #fff;
+  border-color: #fff;
+  color: transparent;
+}
+
 .pin {
   position: absolute;
   left: 0;
@@ -1786,6 +1621,16 @@ body.is-scrolling .hero__content {
   font-size: 1px;
   cursor: pointer;
   transition: background-color 0.25s, box-shadow 0.25s;
+}
+
+/* Soft gold pulse after the tile wave, until the button is clicked */
+.pcard__explore.is-glowing {
+  animation: exploreGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes exploreGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(202, 152, 44, 0); }
+  50% { box-shadow: 0 0 22px 4px rgba(202, 152, 44, 0.55), 0 0 0 2px rgba(202, 152, 44, 0.35); }
 }
 
 .pcard__explore:hover {
@@ -2081,7 +1926,7 @@ body.is-scrolling .hero__content {
 }
 
 .pcard__grid button {
-  background: #F5F1E8;
+  background: #FFFFFF;
   color: #484848;
   cursor: pointer;
   border-radius: 0;
@@ -2110,7 +1955,7 @@ body.is-scrolling .hero__content {
   opacity: 0.18 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
-  background: #F5F1E8 !important;
+  background: #FFFFFF !important;
   color: rgba(72, 72, 72, 0.65) !important;
   transform: none !important;
   box-shadow: none !important;
@@ -2960,7 +2805,7 @@ body.is-scrolling .hero__content {
 
 .amen__head {
   margin: 0;
-  font: 400 clamp(2.2rem, 5.4vw, 5.6rem) / 1.12 var(--f-display);
+  font: 400 calc(clamp(2.2rem, 5.4vw, 5.6rem) - 10px) / 1.12 var(--f-display);
   text-transform: uppercase;
 }
 
@@ -3240,8 +3085,8 @@ body.is-scrolling .hero__content {
 .amen--live .amen__frame {
   flex: 0 0 auto;
   margin-top: 4vh;
-  width: min(53vw, 1018px);
-  height: calc(min(53vw, 1018px) * 558 / 1018);
+  width: min(62vw, 1240px);
+  height: calc(min(62vw, 1240px) * 558 / 1018);
   aspect-ratio: auto;
 }
 

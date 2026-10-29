@@ -180,12 +180,25 @@
   const titleTopY = () => NAV_CLEAR + head.offsetHeight / 2 - vh() / 2;
   const vh = () => window.innerHeight;
 
+  // Fit the sketch between the title's resting place and the lines below it,
+  // so short screens shrink it instead of letting it overlap the title
+  let sketchRestY = 0;
+  const fitSketch = () => {
+    const top = NAV_CLEAR + head.offsetHeight + 24;
+    const bottom = vh() * 0.84 - 24;
+    const h = Math.max(120, Math.min(window.innerWidth * 0.435 * 592 / 767, vh() * 0.76 * 592 / 767, bottom - top));
+    sketch.style.width = (h * 767 / 592) + 'px';
+    sketchRestY = (top + bottom) / 2 - vh() * 0.475;
+  };
+  fitSketch();
+  ScrollTrigger.addEventListener('refreshInit', fitSketch);
+
   // ---- Initial states (all centring is done here, not in CSS) ----
   gsap.set(pillars[0], { xPercent: -50 });
   gsap.set(pillars[1], { xPercent: 50 });
   gsap.set(pillars, { opacity: 1 }); // their layer is masked by the ink instead
   gsap.set(head, { xPercent: -50, yPercent: -50 });
-  gsap.set(sketch, { xPercent: -50, yPercent: -50, y: () => vh() * 0.75, rotation: 0 });
+  gsap.set(sketch, { xPercent: -50, yPercent: -50, y: () => vh() * 0.525 + sketch.offsetHeight / 2 + 40, rotation: 0 });
   gsap.set(sketches[0], { opacity: 1 });
   gsap.set(linesBox, { xPercent: -50 });
   gsap.set(lines, { opacity: 0, y: 24 });
@@ -226,7 +239,7 @@
     .addLabel('sketch')
     .to(head, { y: titleTopY, duration: 1.2 }, 'sketch')
     // The sketch follows a beat later, so it never runs into the title on the way up
-    .to(sketch, { y: 0, duration: 1.2, ease: 'power3.out' }, 'sketch+=0.55')
+    .to(sketch, { y: () => sketchRestY, duration: 1.2, ease: 'power3.out' }, 'sketch+=0.55')
     .to(paper, { opacity: 0.7, duration: 1.2, ease: 'none' }, 'sketch')
     .to({}, { duration: 0.25 })
 
