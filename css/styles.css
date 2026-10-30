@@ -4226,8 +4226,7 @@ body.is-scrolling .hero__content {
   left: 4.9vw;
   top: 50%;
   width: 34vw;
-  translate: 0 -50%;
-  /* separate from the GSAP transform used for the exit */
+  transform: translateY(-50%);
 }
 
 .conn__rera-title {
@@ -4281,6 +4280,7 @@ body.is-scrolling .hero__content {
     right: var(--gutter);
     top: calc(14svh + 0.5rem);
     width: auto;
+    transform: none;
     translate: none;
   }
 

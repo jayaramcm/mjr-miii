@@ -85,7 +85,7 @@
       const enterY = window.innerHeight * 0.65 * (1 - r);
       gsap.set(scene, { x: -w * s, y: exitY });
       gsap.set(rera, { x: w * (1 - s) });
-      gsap.set(reraCopy, { x: 0, y: exitY });
+      gsap.set(reraCopy, { x: 0, y: exitY, yPercent: 0 });
       gsap.set(folder, {
         opacity: 1,
         x: 0,
@@ -96,7 +96,7 @@
       const out = slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerWidth;
       gsap.set(scene, { x: -w * s - out, y: 0 });
       gsap.set(rera, { x: w * (1 - s) });
-      gsap.set(reraCopy, { x: -out, y: 0 });
+      gsap.set(reraCopy, { x: -out, y: 0, yPercent: -50 });
       gsap.set(folder, {
         opacity: 1,
         x: window.innerWidth * 0.45 * (1 - r) + out,
