@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet">
   <link rel="preload" as="video" href="Assets/hero-day-and-night.mp4" type="video/mp4">
-  <link rel="stylesheet" href="css/styles.css?v=91">
+  <link rel="stylesheet" href="css/styles.css?v=112">
 </head>
 <body>
   <!-- Preloader: the MJR mark builds itself. Shown on first load and between
@@ -217,15 +217,15 @@
           </div>
           <ul class="pillars">
             <li class="pillar">
-              <img class="pillar__img" src="Assets/pillar.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
               <div class="pillar__copy"><h3>Own</h3><p>A plot you can call your own.</p></div>
             </li>
             <li class="pillar">
-              <img class="pillar__img" src="Assets/pillar.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
               <div class="pillar__copy"><h3>Build</h3><p>Freedom to plan and build your future.</p></div>
             </li>
             <li class="pillar">
-              <img class="pillar__img" src="Assets/pillar.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
               <div class="pillar__copy"><h3>Belong</h3><p>A thoughtfully planned community with spaces for everyday living.</p></div>
             </li>
           </ul>
@@ -252,6 +252,7 @@
               <ul class="plotpop__hl" id="ppHighlights"></ul>
               <button class="plotpop__close" id="ppClose" type="button" aria-label="Close plot details" title="Close">
                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" fill="none" stroke="#1D2856" stroke-width="2.5" stroke-linecap="round"/></svg>
+                <span class="plotpop__close-label">Close</span>
               </button>
             </article>
 
@@ -270,12 +271,18 @@
 
               <div class="pcard__inner">
                 <div class="pcard__face pcard__face--front">
-                  <img src="Assets/Plot-card.svg" alt="" aria-hidden="true" width="700" height="900" decoding="async">
+                  <picture>
+                    <source media="(max-width: 640px)" srcset="Assets/Plot-card-mobile.svg?v=2">
+                    <img src="Assets/Plot-card.svg" alt="" aria-hidden="true" width="700" height="900" decoding="async">
+                  </picture>
                   <h2 class="sr-only">A closer look at your future address</h2>
                   <button class="pcard__explore" id="exploreBtn" type="button">Explore the plots</button>
                 </div>
                 <div class="pcard__face pcard__face--back" aria-labelledby="selectTitle">
-                  <img src="Assets/Plot-Card-Selection.svg?v=2" alt="" aria-hidden="true" width="700" height="900" decoding="async">
+                  <picture>
+                    <source media="(max-width: 640px)" srcset="Assets/Plot-Card-Selection-mobile.svg?v=2">
+                    <img src="Assets/Plot-Card-Selection.svg?v=2" alt="" aria-hidden="true" width="700" height="900" decoding="async">
+                  </picture>
                   <h2 class="sr-only" id="selectTitle">Find the plot that fits your plans</h2>
                   <button class="pcard__filters" id="filterBtn" type="button" aria-haspopup="true" aria-expanded="false">Filters</button>
                   <div class="pcard__filter-panel" id="filterMenu" hidden>
@@ -449,7 +456,7 @@
               </aside>
             </div>
           </div>
-          <p class="mplan__label" aria-hidden="true">Master<br>Plan</p>
+          <p class="mplan__label" aria-hidden="true">Master <br>Plan</p>
         </div>
       </div>
     </section>
@@ -640,6 +647,27 @@
             <img class="acard__cover-svg" src="Assets/Amenities-cover.svg?v=2" alt="Amenities - More Than You Expect" loading="lazy" decoding="async">
           </article>
         </div>
+
+        <!-- Mobile category slider signifier (rises from bottom when Amenities cover lifts) -->
+        <nav class="amen__slider" id="amenSlider" aria-label="Amenity categories">
+          <button class="amen__slider-side amen__slider-side--prev" id="amenPrevCat" type="button" aria-label="Previous amenity category">
+            <span class="amen__slider-side-label" id="amenPrevLabel">Relax</span>
+          </button>
+          <button class="amen__slider-arrow amen__slider-arrow--prev" id="amenPrevArrow" type="button" aria-label="Previous category">
+            <svg viewBox="0 0 28 24" width="26" height="22" aria-hidden="true">
+              <path d="M13 4L5 12l8 8M22 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <span class="amen__slider-active" id="amenActiveLabel" aria-live="polite">Live</span>
+          <button class="amen__slider-arrow amen__slider-arrow--next" id="amenNextArrow" type="button" aria-label="Next category">
+            <svg viewBox="0 0 28 24" width="26" height="22" aria-hidden="true">
+              <path d="M6 4l8 8-8 8M15 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="amen__slider-side amen__slider-side--next" id="amenNextCat" type="button" aria-label="Next amenity category">
+            <span class="amen__slider-side-label" id="amenNextLabel">Play</span>
+          </button>
+        </nav>
       </div>
     </section>
 
@@ -890,15 +918,6 @@
         <p class="footer__name">MJR Township @ Kalwakurthy</p>
         <address class="footer__addr">Survey No. 720 &amp; 729, Tirupati Highway (NH 167K), Kalwakurthy, Nagarkurnool (D) &ndash; 509 324, Telangana, India</address>
       </div>
-      <nav class="footer__nav" aria-label="Footer">
-        <a href="#overview">Overview</a>
-        <a href="#mplan">Master plan</a>
-        <a href="#amenities">Amenities</a>
-        <a href="#location">Location</a>
-        <a href="#about">About MJR</a>
-        <a href="#faq">FAQ</a>
-        <a href="#contact">Contact</a>
-      </nav>
       <div class="footer__contact">
         <a href="tel:+919010055596">+91 90100 55596</a>
         <a href="mailto:sales@mjrinfra.com">sales@mjrinfra.com</a>
@@ -962,10 +981,10 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="js/plots-data.js?v=4" defer></script>
-  <script src="js/main.js?v=50" defer></script>
-  <script src="js/amenities.js?v=18" defer></script>
-  <script src="js/connectivity.js?v=14" defer></script>
-  <script src="js/about.js?v=24" defer></script>
+  <script src="js/main.js?v=58" defer></script>
+  <script src="js/amenities.js?v=22" defer></script>
+  <script src="js/connectivity.js?v=16" defer></script>
+  <script src="js/about.js?v=26" defer></script>
   <script src="js/sections.js?v=11" defer></script>
 </body>
 </html>

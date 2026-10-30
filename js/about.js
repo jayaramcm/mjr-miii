@@ -184,9 +184,11 @@
   // so short screens shrink it instead of letting it overlap the title
   let sketchRestY = 0;
   const fitSketch = () => {
+    const isPhone = window.innerWidth <= 760;
     const top = NAV_CLEAR + head.offsetHeight + 24;
     const bottom = vh() * 0.84 - 24;
-    const h = Math.max(120, Math.min(window.innerWidth * 0.435 * 592 / 767, vh() * 0.76 * 592 / 767, bottom - top));
+    const widthShare = isPhone ? 0.86 : 0.435;
+    const h = Math.max(120, Math.min(window.innerWidth * widthShare * 592 / 767, vh() * 0.76 * 592 / 767, bottom - top));
     sketch.style.width = (h * 767 / 592) + 'px';
     sketchRestY = (top + bottom) / 2 - vh() * 0.475;
   };
@@ -276,7 +278,7 @@
     .addLabel('rise')
     .to([question, answer], { opacity: 0, y: () => -vh() * 0.08, duration: 0.7, ease: 'power2.in' }, 'rise')
     .to(since, { y: 0, scale: 1, opacity: 1, duration: 1.4 }, 'rise+=0.3')
-    .to(pillars, { scale: 1.5, y: () => -vh() * 0.38, duration: 1.4 }, 'rise+=0.3')
+    .to(pillars, { scale: 1.5, y: () => -vh() * (window.innerWidth <= 760 ? 0.22 : 0.38), duration: 1.4 }, 'rise+=0.3')
     .to({}, { duration: 0.5 })
 
     // Since 2012 shrinks and fades, then each fact takes its place in turn:
@@ -286,7 +288,7 @@
   facts.forEach((fact, k) => {
     // The pillars lift a step as the previous line fades out, then the fact
     // comes in once that fade is done; they stay put for the letter
-    tl.to(pillars, { y: () => -vh() * (0.38 + 0.12 * (k + 1)), duration: 0.9 }, '<')
+    tl.to(pillars, { y: () => -vh() * (window.innerWidth <= 760 ? 0.22 + 0.055 * (k + 1) : 0.38 + 0.12 * (k + 1)), duration: 0.9 }, '<')
       .to(fact, { opacity: 1, scale: 1, duration: 0.7, ease: 'power2.out' }, '<0.7')
       .to({}, { duration: 0.5 })
       .to(fact, { scale: 0.85, opacity: 0, duration: 0.7, ease: 'power2.in' });

@@ -22,9 +22,130 @@
   const isPhone = () => window.matchMedia('(max-width: 760px)').matches;
 
   let isDealt = false;
+  let activeCatIdx = 0;
+  let isSwitchingCat = false;
+  const categories = ['Live', 'Play', 'Relax'];
+
+  const slider = section.querySelector('#amenSlider');
+  const prevCatBtn = section.querySelector('#amenPrevCat');
+  const nextCatBtn = section.querySelector('#amenNextCat');
+  const prevArrowBtn = section.querySelector('#amenPrevArrow');
+  const nextArrowBtn = section.querySelector('#amenNextArrow');
+  const prevLabelEl = section.querySelector('#amenPrevLabel');
+  const activeLabelEl = section.querySelector('#amenActiveLabel');
+  const nextLabelEl = section.querySelector('#amenNextLabel');
+
+  const stackControllers = [];
+
+  function updateSliderLabels(dir = 0) {
+    const count = categories.length;
+    const prevIdx = (activeCatIdx + count - 1) % count;
+    const nextIdx = (activeCatIdx + 1) % count;
+
+    if (!window.gsap || dir === 0) {
+      if (prevLabelEl) prevLabelEl.textContent = categories[prevIdx];
+      if (activeLabelEl) activeLabelEl.textContent = categories[activeCatIdx];
+      if (nextLabelEl) nextLabelEl.textContent = categories[nextIdx];
+      return;
+    }
+
+    const items = [prevLabelEl, activeLabelEl, nextLabelEl].filter(Boolean);
+    window.gsap.to(items, {
+      x: -dir * 14,
+      opacity: 0,
+      duration: 0.14,
+      ease: 'power1.in',
+      overwrite: 'auto',
+      onComplete: () => {
+        if (prevLabelEl) prevLabelEl.textContent = categories[prevIdx];
+        if (activeLabelEl) activeLabelEl.textContent = categories[activeCatIdx];
+        if (nextLabelEl) nextLabelEl.textContent = categories[nextIdx];
+        window.gsap.fromTo(
+          items,
+          { x: dir * 14, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.22,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          }
+        );
+      },
+    });
+  }
+
+  function switchCategory(dir) {
+    if (!isDealt || isSwitchingCat || stacks.length < 2) return;
+    isSwitchingCat = true;
+
+    const count = stacks.length;
+    const prevIdx = activeCatIdx;
+    const nextIdx = (activeCatIdx + dir + count) % count;
+    activeCatIdx = nextIdx;
+
+    const prevStack = stacks[prevIdx];
+    const nextStack = stacks[nextIdx];
+
+    prevStack.classList.remove('is-dealt');
+    nextStack.classList.add('is-dealt');
+
+    // Reset incoming category stack to its cover card (index 0) so the user starts at the category cover
+    if (stackControllers[nextIdx]) {
+      stackControllers[nextIdx].resetOrder();
+    }
+
+    updateSliderLabels(dir);
+
+    if (!window.gsap) {
+      prevStack.style.opacity = '0';
+      prevStack.style.zIndex = '1';
+      nextStack.style.opacity = '1';
+      nextStack.style.zIndex = '3';
+      isSwitchingCat = false;
+      return;
+    }
+
+    const slideOffset = dir * 65;
+    window.gsap.set(nextStack, {
+      x: slideOffset,
+      y: 0,
+      rotation: 0,
+      scale: 0.96,
+      opacity: 0,
+      zIndex: 4,
+    });
+    window.gsap.set(prevStack, { zIndex: 3 });
+
+    window.gsap.to(prevStack, {
+      x: -slideOffset,
+      scale: 0.96,
+      opacity: 0,
+      duration: 0.32,
+      ease: 'power2.out',
+      overwrite: 'auto',
+      onComplete: () => {
+        window.gsap.set(prevStack, { x: 0, y: 0, scale: 1, zIndex: 1 });
+      },
+    });
+
+    window.gsap.to(nextStack, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      opacity: 1,
+      duration: 0.36,
+      ease: 'power3.out',
+      overwrite: 'auto',
+      onComplete: () => {
+        window.gsap.set(nextStack, { zIndex: 3 });
+        isSwitchingCat = false;
+      },
+    });
+  }
 
   /* ---------- Shuffle Stack Interaction ---------- */
-  function setupShuffleStack(stack) {
+  function setupShuffleStack(stack, stackIdx) {
     const cards = [...stack.querySelectorAll('.icard')];
     const count = cards.length;
     if (!count) return;
@@ -36,22 +157,20 @@
     let order = cards.map((_, i) => i);
 
     function getCardTransform(pos, hovered) {
-      if (pos === 0 || !hovered) {
-        // When not hovered, all cards sit flush directly behind the front card
-        // Showing ONLY the cover card cleanly
+      // Front card (or before the main Amenities cover lifts up): sit flush at 0
+      if (pos === 0 || !isDealt) {
         return { x: 0, y: 0, rotation: 0, scale: 1 };
       }
-      // Only when hovered: display as an interactive stack with staggered peek offsets
-      const sign = pos % 2 === 1 ? 1 : -1;
-      const xOffset = sign * (12 + (pos - 1) * 8);
-      const yOffset = -pos * 10;
-      const rot = sign * (2.2 + (pos - 1) * 1.1);
-      const sc = 1 - pos * 0.012;
+      // Once dealt: show 3 stepped cards peeking behind the top edge of the main card (Frame 89 cue)
+      const stepIdx = Math.min(pos, 3);
+      const yStep = isPhone() ? 8 : 10;
+      const scaleStep = 0.042;
+      const extraLift = hovered && !isPhone() ? stepIdx * 3 : 0;
       return {
-        x: xOffset,
-        y: yOffset,
-        rotation: rot,
-        scale: sc,
+        x: 0,
+        y: -(stepIdx * yStep + extraLift),
+        rotation: 0,
+        scale: 1 - stepIdx * scaleStep,
       };
     }
 
@@ -81,32 +200,39 @@
       });
     }
 
+    function resetOrder() {
+      order = cards.map((_, i) => i);
+      isHovered = false;
+      isShuffling = false;
+      applyStack(false);
+    }
+
     // Initialize resting positions
     applyStack(false);
 
-    // Hover peeking - strictly disabled until dealt out
+    // Hover peeking - desktop only, strictly disabled on phone or until dealt out
     stack.addEventListener('pointerenter', () => {
-      if (!isDealt || isShuffling) return;
+      if (!isDealt || isShuffling || isPhone()) return;
       isHovered = true;
       applyStack(true);
     });
 
     stack.addEventListener('pointerleave', () => {
-      if (!isDealt || isShuffling) return;
+      if (!isDealt || isShuffling || isPhone()) return;
       isHovered = false;
       applyStack(true);
     });
 
     // Shuffle top card: lifts straight UP and goes to the back of the stack (NO sideways movement)
     function shuffle() {
-      if (!isDealt || isShuffling || count <= 1) return;
+      if (!isDealt || isShuffling || isSwitchingCat || count <= 1) return;
       isShuffling = true;
 
       const topCardIdx = order[0];
       const topCard = cards[topCardIdx];
 
       // Card lifts straight up without any sideways movement
-      const upY = isPhone() ? -95 : -130;
+      const upY = isPhone() ? -115 : -130;
 
       if (!window.gsap) {
         order.push(order.shift());
@@ -171,43 +297,153 @@
       });
     }
 
+    // Gesture tracking on card stack:
+    // - Mobile horizontal swipe (left/right): switch between the 3 category decks (Live, Play, Relax)
+    // - Mobile vertical swipe UP: switch subset cards within the active category deck
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    let suppressClick = false;
+
+    stack.addEventListener('pointerdown', (e) => {
+      if (!isDealt) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      tracking = true;
+      suppressClick = false;
+    });
+
+    stack.addEventListener('pointerup', (e) => {
+      if (!tracking) return;
+      tracking = false;
+      if (!isDealt) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (isPhone()) {
+        // Horizontal swipe -> switch to next/prev category deck
+        if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+          suppressClick = true;
+          switchCategory(dx < 0 ? 1 : -1);
+          return;
+        }
+        // Vertical swipe UP -> cycle subset cards of the active category
+        if (dy < -22 && Math.abs(dy) >= Math.abs(dx)) {
+          suppressClick = true;
+          shuffle();
+          return;
+        }
+      }
+    });
+
+    stack.addEventListener('pointercancel', () => {
+      tracking = false;
+    });
+
     stack.addEventListener('click', (e) => {
       e.preventDefault();
-      shuffle();
+      if (suppressClick) {
+        suppressClick = false;
+        return;
+      }
+      if (!isPhone()) {
+        shuffle();
+      }
     });
 
     stack.setAttribute('tabindex', '0');
     stack.setAttribute('role', 'button');
     stack.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowUp') {
         e.preventDefault();
         shuffle();
+      } else if (isPhone() && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        switchCategory(-1);
+      } else if (isPhone() && e.key === 'ArrowRight') {
+        e.preventDefault();
+        switchCategory(1);
       }
     });
+
+    stackControllers[stackIdx] = { resetOrder, applyStack, shuffle };
   }
 
   // Set up shuffle for each of the 3 stacks
   const stacks = [...section.querySelectorAll('.amen-stack')];
-  stacks.forEach(setupShuffleStack);
+  stacks.forEach((s, idx) => setupShuffleStack(s, idx));
+
+  // Wire up mobile bottom category slider signifier buttons & swipe
+  if (prevCatBtn) prevCatBtn.addEventListener('click', () => switchCategory(-1));
+  if (prevArrowBtn) prevArrowBtn.addEventListener('click', () => switchCategory(-1));
+  if (nextCatBtn) nextCatBtn.addEventListener('click', () => switchCategory(1));
+  if (nextArrowBtn) nextArrowBtn.addEventListener('click', () => switchCategory(1));
+
+  if (slider) {
+    let sliderStartX = 0;
+    let sliderTracking = false;
+    slider.addEventListener('pointerdown', (e) => {
+      sliderStartX = e.clientX;
+      sliderTracking = true;
+    });
+    slider.addEventListener('pointerup', (e) => {
+      if (!sliderTracking) return;
+      sliderTracking = false;
+      const dx = e.clientX - sliderStartX;
+      if (Math.abs(dx) > 28) {
+        switchCategory(dx < 0 ? 1 : -1);
+      }
+    });
+    slider.addEventListener('pointercancel', () => {
+      sliderTracking = false;
+    });
+  }
 
   function setDealt(dealt) {
     if (isDealt === dealt) return;
     isDealt = dealt;
-    stacks.forEach((s) => {
-      s.classList.toggle('is-dealt', dealt);
+
+    if (slider) {
+      slider.classList.toggle('is-active', dealt && isPhone());
+    }
+
+    if (isPhone()) {
       if (!dealt) {
-        // Force collapse back to resting single-card look
-        const cards = [...s.querySelectorAll('.icard')];
-        cards.forEach((card, pos) => {
-          card.setAttribute('data-pos', String(pos));
-          card.setAttribute('data-active', pos === 0 ? 'true' : 'false');
-          if (window.gsap) {
-            window.gsap.set(card, { x: 0, y: 0, rotation: 0, scale: 1, zIndex: cards.length - pos });
+        activeCatIdx = 0;
+        isSwitchingCat = false;
+        updateSliderLabels(0);
+      }
+      stacks.forEach((s, idx) => {
+        const isActiveStack = dealt && idx === activeCatIdx;
+        s.classList.toggle('is-dealt', isActiveStack);
+        if (stackControllers[idx]) {
+          if (dealt) {
+            stackControllers[idx].applyStack(true);
           } else {
-            card.style.transform = 'translate3d(0, 0, 0) rotate(0deg) scale(1)';
-            card.style.zIndex = String(cards.length - pos);
+            stackControllers[idx].resetOrder();
           }
-        });
+        }
+        if (window.gsap && !dealt) {
+          window.gsap.set(s, {
+            x: 0,
+            opacity: idx === 0 ? 1 : 0,
+            scale: 1,
+            zIndex: idx === 0 ? 3 : 1,
+          });
+        }
+      });
+      return;
+    }
+
+    stacks.forEach((s, idx) => {
+      s.classList.toggle('is-dealt', dealt);
+      if (stackControllers[idx]) {
+        if (dealt) {
+          stackControllers[idx].applyStack(true);
+        } else {
+          stackControllers[idx].resetOrder();
+        }
       }
     });
   }
@@ -236,37 +472,62 @@
   const step = () => stacks[0].offsetWidth + (isPhone() ? 24 : Math.max(38, Math.min(68, window.innerWidth * 0.035)));
 
   const NAV_CLEAR = 110; // keep the heading clear of the logo in the nav bar
+  // Elongate the 3-tower shape ONLY on the bottom side on taller viewports (mobile)
+  // by measuring the top slanted roof vertices (--t1, --t2) in px from the top at 56.95vw scale.
+  const logoH = () => window.innerWidth * 0.5695;
+  const fitShape = () => {
+    const h = logoH();
+    const totalH = Math.max(h, vh());
+    shape.style.height = totalH + 'px';
+    gsap.set(bldgs[0], { '--t1': (h * 0.4404).toFixed(1) + 'px', '--t2': (h * 0.2301).toFixed(1) + 'px' });
+    gsap.set(bldgs[1], { '--t1': (h * 0.2092).toFixed(1) + 'px', '--t2': '0px' });
+    gsap.set(bldgs[2], { '--t1': (h * 0.3003).toFixed(1) + 'px', '--t2': (h * 0.6043).toFixed(1) + 'px' });
+  };
   // Fit the photo so heading, photo and caption share one screen
   const fitFrame = () => {
     const room = vh() - NAV_CLEAR - head.offsetHeight - copy.offsetHeight - vh() * 0.07 - 40;
     const w = Math.max(200, Math.min(window.innerWidth * (isPhone() ? 0.88 : 0.62), 1240, room * 1018 / 558));
     frame.style.width = w + 'px';
-    frame.style.height = w * 558 / 1018 + 'px';
+    frame.style.height = (w * 558 / 1018 + (isPhone() ? 20 : 0)) + 'px';
   };
+  fitShape();
   fitFrame();
   ScrollTrigger.addEventListener('refreshInit', () => {
     gsap.set(frame, { clearProps: 'width,height,padding,y' });
+    fitShape();
     fitFrame();
   });
-  // Column offset that puts the heading just under the nav bar
-  const settleY = () => NAV_CLEAR - head.offsetTop;
+  // Column offset: on desktop puts the heading just under the nav bar;
+  // on mobile keeps the entire [heading + image + copy] container center-aligned vertically
+  const settleY = () => {
+    if (isPhone()) {
+      const blockTop = head.offsetTop;
+      const blockBottom = copy.offsetTop + copy.offsetHeight;
+      const blockH = blockBottom - blockTop;
+      const targetTop = Math.max(NAV_CLEAR, (vh() - blockH) / 2 + 16);
+      return targetTop - blockTop;
+    }
+    return NAV_CLEAR - head.offsetTop;
+  };
 
   gsap.set(shape, { y: () => shape.offsetHeight + 40 });
   gsap.set(navy, { opacity: 0 });
   gsap.set(q, { opacity: 0, y: () => Math.min(vh() * 0.25, 120) });
   gsap.set(rule, { scaleY: 0, transformOrigin: 'top center' });
 
-  // Initial 4-card stack: Cover on top (index 3), Relax (2), Play (1), Live (0)
-  // Cards peek up and left behind the cover
+  // Initial 4-card pile: overlapped directly on one another (no diagonal stack offset)
   gsap.set(allDeckCards, {
     xPercent: -50,
     yPercent: -50,
-    x: (i) => (i - 3) * 14,
-    y: (i) => vh() + (i - 3) * 14,
-    zIndex: (i) => (i === 3 ? 10 : i + 1),
+    x: 0,
+    y: () => vh(),
+    zIndex: (i) => (i === 3 ? 10 : isPhone() ? (i === 0 ? 3 : 1) : i + 1),
     rotation: 0,
-    opacity: 1,
+    opacity: (i) => (isPhone() && i !== 0 && i !== 3 ? 0 : 1),
   });
+  if (slider) {
+    gsap.set(slider, { y: 65, opacity: 0 });
+  }
 
   const RISE = 1.6; // screens of scroll for step 1, overlapping the plan's pin
 
@@ -281,12 +542,46 @@
       invalidateOnRefresh: true,
     },
   })
-    .to(shape, { y: () => shape.offsetHeight - vh(), duration: 1.4, ease: 'power3.out' })
+    .fromTo(
+      shape,
+      { y: () => shape.offsetHeight + 40 },
+      { y: () => shape.offsetHeight - vh(), duration: 1.4, ease: 'power3.out' }
+    )
     .addLabel('open')
     .to(shape, { left: '0%', width: '100%', height: '100%', y: 0, duration: 1.2 }, 'open')
-    .to(bldgs[0], { left: '0%', width: '33.4%', clipPath: 'polygon(0 0%, 100% 0%, 100% 100%, 0 100%)', duration: 1.2 }, 'open')
-    .to(bldgs[1], { left: '33.3%', width: '33.4%', clipPath: 'polygon(0 0%, 100% 0%, 100% 100%, 0 100%)', duration: 1.2 }, 'open')
-    .to(bldgs[2], { left: '66.6%', width: '33.4%', clipPath: 'polygon(0 0%, 100% 0%, 100% 100%, 0 100%)', duration: 1.2 }, 'open')
+    .fromTo(
+      bldgs[0],
+      {
+        left: '0%',
+        width: '30.68%',
+        '--t1': () => (logoH() * 0.4404).toFixed(1) + 'px',
+        '--t2': () => (logoH() * 0.2301).toFixed(1) + 'px',
+      },
+      { left: '0%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 },
+      'open'
+    )
+    .fromTo(
+      bldgs[1],
+      {
+        left: '34.64%',
+        width: '30.72%',
+        '--t1': () => (logoH() * 0.2092).toFixed(1) + 'px',
+        '--t2': '0px',
+      },
+      { left: '33.3%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 },
+      'open'
+    )
+    .fromTo(
+      bldgs[2],
+      {
+        left: '69.32%',
+        width: '30.68%',
+        '--t1': () => (logoH() * 0.3003).toFixed(1) + 'px',
+        '--t2': () => (logoH() * 0.6043).toFixed(1) + 'px',
+      },
+      { left: '66.6%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 },
+      'open'
+    )
     .to(navy, { opacity: 1, duration: 0.5, ease: 'none' }, 'open+=0.8');
 
   const tl = gsap.timeline({
@@ -299,8 +594,8 @@
       scrub: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        // Effect should ONLY work once the 3 stacks have dealt out and taken their places
-        const dealThreshold = tl.labels['deal'] ? (tl.labels['deal'] + 0.8) / tl.totalDuration() : 0.85;
+        const dealOffset = isPhone() ? 0.15 : 0.6;
+        const dealThreshold = tl.labels['deal'] ? (tl.labels['deal'] + dealOffset) / tl.totalDuration() : 0.78;
         setDealt(self.progress >= dealThreshold);
       },
     },
@@ -331,38 +626,44 @@
       duration: 1.3,
     }, 'bleed')
 
-  // 5. 4-card deck rises with Amenities cover on top
+  // 5. 4-card deck rises overlapped on one another with Amenities cover on top
     .addLabel('deck', '+=0.3')
     .to(allDeckCards, {
-      y: (i) => (i - 3) * 14,
+      y: 0,
       duration: 1.3,
       ease: 'power3.out',
-      stagger: 0.06,
+      stagger: isPhone() ? 0 : 0.04,
     }, 'deck')
 
-  // 6. Cover lifts up with angle/tilt off-screen, NO fading; the 3 category stacks deal out side by side
+  // 6. Cover lifts up with angle/tilt off-screen
     .addLabel('deal', '+=0.4')
     .to(cover, {
       y: () => -vh() * 1.5,
-      rotation: -9,
-      duration: 1.3,
-      ease: 'power3.inOut',
-    }, 'deal')
-    .to(stacks, {
-      x: (i) => (i - 1) * step(),
-      y: 0,
-      rotation: 0,
+      rotation: () => (isPhone() ? -14 : -9),
       duration: 1.3,
       ease: 'power3.inOut',
     }, 'deal');
 
   if (isPhone()) {
-    // Only one card fits: pan the dealt row from Live across to Relax
-    tl.to(deck, { x: () => step(), duration: 1.3, ease: 'power3.inOut' }, 'deal')
-      .to(deck, { x: () => -step(), duration: 2.4, ease: 'none' }, '+=0.3')
-      .to({}, { duration: 0.4 });
+    // On mobile: cards stay overlapped in the center while the category slider rises from the bottom
+    if (slider) {
+      tl.fromTo(
+        slider,
+        { y: 65, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.95, ease: 'power3.out' },
+        'deal+=0.2'
+      );
+    }
+    tl.to({}, { duration: 1.6 });
   } else {
-    tl.to({}, { duration: 1 });
+    tl.to(stacks, {
+      x: (i) => (i - 1) * step(),
+      y: 0,
+      rotation: 0,
+      duration: 1.3,
+      ease: 'power3.inOut',
+    }, 'deal')
+      .to({}, { duration: 1 });
   }
 
   window.addEventListener('load', () => ScrollTrigger.refresh());

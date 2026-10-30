@@ -534,10 +534,24 @@
       const STRIP = 0.91; // strip left edge as a fraction of the viewport
 
       // Conveyor positions
-      const OFF_RIGHT = { x: () => window.innerWidth, rotation: 14, scale: 1, opacity: 1, filter: 'blur(0px)' };
-      const CENTER = { x: 0, rotation: 0, scale: 1, opacity: 1, filter: 'blur(0px)' };
-      const LEFT = { x: () => -window.innerWidth * 0.37, rotation: 0, scale: 0.74, opacity: 0.8, filter: 'blur(3px)' };
-      const OFF_LEFT = { x: () => -window.innerWidth * 0.9, rotation: -6, scale: 0.6, opacity: 0, filter: 'blur(6px)' };
+      const OFF_RIGHT = { x: () => window.innerWidth, y: 0, rotation: 14, scale: 1, opacity: 1, filter: 'blur(0px)' };
+      const CENTER = { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, filter: 'blur(0px)' };
+      const LEFT = {
+        x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * 0.37,
+        y: () => window.innerWidth <= 640 ? -window.innerHeight * 0.39 : 0,
+        rotation: 0,
+        scale: 0.74,
+        opacity: 0.8,
+        filter: 'blur(3px)',
+      };
+      const OFF_LEFT = {
+        x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * 0.9,
+        y: () => window.innerWidth <= 640 ? -window.innerHeight * 0.72 : 0,
+        rotation: () => window.innerWidth <= 640 ? 0 : -6,
+        scale: () => window.innerWidth <= 640 ? 0.56 : 0.6,
+        opacity: () => window.innerWidth <= 640 ? 0.65 : 0,
+        filter: 'blur(6px)',
+      };
       const move = { duration: 1, ease: 'power2.inOut' };
       // Next pillar waiting at the right edge: the first pillar's entry pose (14deg tilt),
       // paused with just the capital's corner showing
@@ -545,12 +559,13 @@
       const PEEK = {
         x: () => {
           const vw = window.innerWidth;
-          const w = pillars[0].querySelector('.pillar__img').offsetWidth;
+          const w = pillars[0].querySelector('.pillar__img').offsetWidth / 2.2316;
           // capital height above the base pivot; the tilt swings it right by sin(a) * h
-          const h = Math.max(vw * 0.3396, window.innerHeight * 0.6037);
+          const h = vw <= 640 ? window.innerHeight * 0.43 : Math.max(vw * 0.3396, window.innerHeight * 0.6037);
           const swing = Math.sin(PEEK_TILT * Math.PI / 180) * h;
           return vw / 2 + w / 2 - swing - vw * 0.04;
         },
+        y: 0,
         rotation: PEEK_TILT, scale: 1, opacity: 1, filter: 'blur(0px)',
       };
 
@@ -559,7 +574,8 @@
       gsap.set(pillars, OFF_RIGHT);
       gsap.set(copies, { opacity: 0, y: 24 });
       gsap.set(card, {
-        yPercent: -50,
+        xPercent: () => window.innerWidth <= 640 ? -50 : 0,
+        yPercent: () => window.innerWidth <= 640 ? 0 : -50,
         y: () => window.innerHeight * 1.2,
         rotationX: 24,
         rotationZ: -7,
@@ -567,10 +583,24 @@
         transformPerspective: 1200,
       });
       const ROAD_SCALE = 1606 / 1540;
-      const roadX = () => -(45 / 1540) * window.innerWidth;
+      const roadScale = () => {
+        if (window.innerWidth <= 640) {
+          return Math.max(ROAD_SCALE, window.innerHeight / (window.innerWidth * 1540 / 979));
+        }
+        return ROAD_SCALE;
+      };
+      const roadX = () => {
+        if (window.innerWidth <= 640) {
+          return -0.07 * window.innerWidth * roadScale();
+        }
+        return -(45 / 1540) * window.innerWidth;
+      };
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
       const grassPullStart = () => window.innerWidth * 0.18;
       const introY = () => {
+        if (window.innerWidth <= 640) {
+          return -(21 / 1540) * window.innerHeight;
+        }
         const h = window.innerWidth * 979 / 1540;
         const vh = window.innerHeight;
         // Start 7% into the image at the top
@@ -583,21 +613,23 @@
         return base;
       };
 
-      gsap.set(mplan, { clipPath: 'inset(0% 0% 0% 100%)' });
+      gsap.set(mplan, {
+        clipPath: window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
+      });
       gsap.set(stage, {
-        x: roadPullStart,
-        y: introY,
-        scale: ROAD_SCALE,
+        x: () => window.innerWidth <= 640 ? roadX() : roadPullStart(),
+        y: () => window.innerWidth <= 640 ? introY() + window.innerHeight * 0.18 : introY(),
+        scale: roadScale,
         transformOrigin: '0 0',
       });
       gsap.set(mplanImg, {
-        x: grassPullStart,
-        y: 0,
+        x: () => window.innerWidth <= 640 ? 0 : grassPullStart(),
+        y: () => window.innerWidth <= 640 ? window.innerHeight * 0.18 : 0,
         scale: 1,
         transformOrigin: '50% 50%',
       });
 
-      const explorer = initExplorer({ mplan: mplanEl, mplanImg, stage, card, openBooking, roadX, introY, ROAD_SCALE });
+      const explorer = initExplorer({ mplan: mplanEl, mplanImg, stage, card, openBooking, roadX, introY, roadScale });
 
       const whyTl = gsap.timeline({
         scrollTrigger: {
@@ -641,10 +673,17 @@
         // Panel 1
         .to(introCopy, { opacity: 1, y: 0, stagger: 0.15, duration: 0.5, ease: 'power2.out' })
         .to({}, { duration: 0.4 })
-        .to(track, { x: () => -window.innerWidth, duration: 1.2, ease: 'power1.inOut' })
+        .to(track, { x: () => -window.innerWidth, duration: 1.2, ease: 'power1.inOut' }, 'pan')
+        .to(tower, {
+          x: () => window.innerWidth <= 640
+            ? -(tower.offsetLeft + tower.offsetWidth - window.innerWidth * 1.15)
+            : 0,
+          duration: window.innerWidth <= 640 ? 1.3 : 0.001,
+          ease: 'power1.inOut',
+        }, 'pan+=0.2')
 
         // Big "Value pillars"
-        .to(pillarsTitle, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' })
+        .to(pillarsTitle, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, window.innerWidth <= 640 ? 'pan+=1.35' : 'pan+=1.2')
         .to({}, { duration: 0.3 })
 
         // Pillar 1 swings in over the heading; heading fades
@@ -671,19 +710,48 @@
         .to(copies[2], { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
         .to({}, { duration: 0.3 })
         // Master plan strip only after Belong has been read
-        .to(mplan, { clipPath: `inset(0% 0% 0% ${STRIP * 100}%)`, duration: 0.8, ease: 'power2.out' }, 'ms')
-        .fromTo(mplanLabel, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 'ms+=0.2')
+        .fromTo(mplan, {
+          clipPath: () => window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
+        }, {
+          clipPath: () => window.innerWidth <= 640 ? `inset(${STRIP * 100}% 0% 0% 0%)` : `inset(0% 0% 0% ${STRIP * 100}%)`,
+          duration: 0.8,
+          ease: 'power2.out',
+        }, 'ms')
+        .fromTo(mplanLabel, { opacity: 0, x: 40, y: 0 }, { opacity: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.out' }, 'ms+=0.2')
         .to({}, { duration: 0.4 })
 
-        // Pulled open: the strip's edge sweeps left to fill the screen, and both
-        // the grassy background and the layout map slide in together from the right
+        // Pulled open: the strip's edge sweeps left (or up on mobile) to fill the screen, and both
+        // the grassy background and the layout map slide in together
         .to(mplan, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'power2.inOut' }, 'mp')
-        .to(mplanImg, { x: 0, duration: 1.8, ease: 'power2.inOut' }, 'mp')
-        .to(stage, { x: roadX, y: introY, scale: ROAD_SCALE, duration: 1.8, ease: 'power2.inOut' }, 'mp')
-        .to(mplanLabel, { x: () => -window.innerWidth * STRIP, duration: 1.8, ease: 'power2.inOut' }, 'mp')
+        .to(mplanImg, { x: 0, y: 0, duration: 1.8, ease: 'power2.inOut' }, 'mp')
+        .to(stage, { x: roadX, y: introY, scale: roadScale, duration: 1.8, ease: 'power2.inOut' }, 'mp')
+        .to(mplanLabel, {
+          x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * STRIP,
+          y: () => window.innerWidth <= 640 ? -window.innerHeight * STRIP : 0,
+          duration: 1.8,
+          ease: 'power2.inOut',
+        }, 'mp')
         .to(mplanLabel, { opacity: 0, duration: 0.5, ease: 'power1.in' }, 'mp+=0.5')
-        .to(pillars[1], { ...OFF_LEFT, duration: 1.6, ease: 'power2.inOut' }, 'mp')
-        .to(pillars[2], { ...OFF_LEFT, duration: 1.8, ease: 'power2.inOut' }, 'mp')
+        .to(pillars[1], {
+          x: () => window.innerWidth <= 640 ? LEFT.x() : OFF_LEFT.x(),
+          y: () => window.innerWidth <= 640 ? LEFT.y() : OFF_LEFT.y(),
+          rotation: () => window.innerWidth <= 640 ? LEFT.rotation : OFF_LEFT.rotation(),
+          scale: () => window.innerWidth <= 640 ? LEFT.scale : OFF_LEFT.scale(),
+          opacity: () => window.innerWidth <= 640 ? LEFT.opacity : OFF_LEFT.opacity(),
+          filter: () => window.innerWidth <= 640 ? LEFT.filter : OFF_LEFT.filter,
+          duration: 1.6,
+          ease: 'power2.inOut',
+        }, 'mp')
+        .to(pillars[2], {
+          x: () => window.innerWidth <= 640 ? CENTER.x : OFF_LEFT.x(),
+          y: () => window.innerWidth <= 640 ? CENTER.y : OFF_LEFT.y(),
+          rotation: () => window.innerWidth <= 640 ? CENTER.rotation : OFF_LEFT.rotation(),
+          scale: () => window.innerWidth <= 640 ? CENTER.scale : OFF_LEFT.scale(),
+          opacity: () => window.innerWidth <= 640 ? CENTER.opacity : OFF_LEFT.opacity(),
+          filter: () => window.innerWidth <= 640 ? CENTER.filter : OFF_LEFT.filter,
+          duration: 1.8,
+          ease: 'power2.inOut',
+        }, 'mp')
         .to({}, { duration: 0.5 })
 
         // Plot card slides up from below with a tilt and settles at the vertical centre
@@ -712,7 +780,7 @@
        intro   - plan fills the frame behind the closer-look card
        fit     - whole plan fitted into the space left of the card, pins on
        zoom    - a selected plot zoomed in, details popup above it */
-  function initExplorer({ mplan, mplanImg, stage, card, openBooking, roadX, introY, ROAD_SCALE }) {
+  function initExplorer({ mplan, mplanImg, stage, card, openBooking, roadX, introY, roadScale }) {
     const data = window.MJR_PLOTS;
     if (!data) return { reset() {} };
     const pinsEl = document.getElementById('planPins');
@@ -734,7 +802,7 @@
     const compass = document.getElementById('cardCompass');
     const minBtn = document.getElementById('cardMinBtn');
     const expandBtn = document.getElementById('cardExpandBtn');
-    const PER = 36;
+    const getPer = () => (window.innerWidth <= 640 ? 18 : 36);
     let page = 0, selected = null, mode = 'intro';
 
     const filterState = {
@@ -810,12 +878,15 @@
       pins[p.n] = b;
     });
 
-    /* Card grid, 36 per page */
+    /* Card grid, 36 per page on desktop/tablet, 18 per page on mobile */
     const renderGrid = () => {
-      const start = page * PER;
-      const items = data.list.slice(start, start + PER);
+      const per = getPer();
+      const maxPage = Math.max(0, Math.ceil(data.list.length / per) - 1);
+      if (page > maxPage) page = maxPage;
+      const start = page * per;
+      const items = data.list.slice(start, start + per);
       grid.innerHTML = '';
-      for (let i = 0; i < PER; i++) {
+      for (let i = 0; i < per; i++) {
         const p = items[i];
         if (!p) { const e = document.createElement('span'); e.className = 'pcard__empty'; grid.appendChild(e); continue; }
         const b = document.createElement('button');
@@ -834,9 +905,9 @@
         });
         grid.appendChild(b);
       }
-      pageLabel.textContent = `${Math.min(start + PER, data.list.length)} of ${data.list.length}`;
+      pageLabel.textContent = `${Math.min(start + per, data.list.length)} of ${data.list.length}`;
       prev.disabled = page === 0;
-      next.disabled = start + PER >= data.list.length;
+      next.disabled = start + per >= data.list.length;
       data.list.forEach((p) => {
         const isMatch = matches(p);
         pins[p.n].classList.toggle('is-filtered-out', !isMatch);
@@ -873,7 +944,7 @@
     });
     next.addEventListener('click', (e) => {
       e.stopPropagation();
-      if ((page + 1) * PER < data.list.length) changePage(page + 1, 'next');
+      if ((page + 1) * getPer() < data.list.length) changePage(page + 1, 'next');
     });
 
     /* Filters toggle & controls */
@@ -956,13 +1027,15 @@
 
     /* Stage views */
     const W = () => mplan.clientWidth;
-    const H = () => W() * data.IMG_H / data.IMG_W;
+    const H = () => window.innerWidth <= 640 ? W() * data.IMG_W / data.IMG_H : W() * data.IMG_H / data.IMG_W;
+    const pinX = (p) => window.innerWidth <= 640 ? p.py : p.px;
+    const pinY = (p) => window.innerWidth <= 640 ? (1 - p.px) : p.py;
     const views = {
       intro: () => ({
         stage: {
           x: roadX(),
           y: introY(),
-          scale: ROAD_SCALE,
+          scale: roadScale(),
         },
         bg: {
           x: 0,
@@ -971,13 +1044,14 @@
         },
       }),
       zoom: (p) => {
+        const isMobile = window.innerWidth <= 640;
         const narrow = window.innerWidth < 760;
         const cardW = card.classList.contains('is-minimized') ? 0 : card.offsetWidth;
         const s = 3.2;
         const targetScreenX = narrow ? window.innerWidth * 0.5 : (window.innerWidth - cardW) * 0.52;
-        const targetScreenY = window.innerHeight * 0.56;
-        const lx = targetScreenX - p.px * W() * s;
-        const ly = targetScreenY - p.py * H() * s;
+        const targetScreenY = isMobile ? window.innerHeight * 0.20 : window.innerHeight * 0.56;
+        const lx = targetScreenX - pinX(p) * W() * s;
+        const ly = targetScreenY - pinY(p) * H() * s;
         const bgScale = 0.6 * s; // 60% of layout scale (parallax depth)
         const bgX = (lx - roadX()) * 0.25;
         const bgY = (ly - introY()) * 0.25;
@@ -1005,8 +1079,8 @@
         const p = data.list[i];
         const pin = pins[p.n];
         if (!pin) continue;
-        const px = curX + p.px * sW;
-        const py = curY + p.py * sH;
+        const px = curX + pinX(p) * sW;
+        const py = curY + pinY(p) * sH;
         pin.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0) translate(-50%, -50%)`;
       }
     };
@@ -1026,6 +1100,7 @@
     };
     updatePins();
     window.addEventListener('resize', () => {
+      renderGrid();
       if (mode === 'zoom' && selected) {
         go(views.zoom(data.byNo[selected]), true);
       } else {
@@ -1059,7 +1134,7 @@
       if (!p) return;
       if (!card.classList.contains('is-flipped')) explore();
       selected = n;
-      page = Math.floor((n - 1) / PER);
+      page = Math.floor((n - 1) / getPer());
       fill(p);
       renderGrid();
       const wasHidden = pop.hidden;
@@ -1238,14 +1313,14 @@
       data.list.forEach((p) => {
         pins[p.n].style.transform = '';
         gsap.set(pins[p.n], {
-          x: curX + p.px * sW, y: curY + p.py * sH, xPercent: -50, yPercent: -50,
+          x: curX + pinX(p) * sW, y: curY + pinY(p) * sH, xPercent: -50, yPercent: -50,
           rotationX: 0, transformPerspective: 2400, transformOrigin: '50% 50%', force3D: false,
         });
       });
       mplan.classList.add('is-teasing');
 
       // Group tiles into columns by their position across the plan, left to right
-      const colOf = (p) => Math.round(p.px * 40);
+      const colOf = (p) => Math.round(pinX(p) * 40);
       const cols = [...new Set(data.list.map(colOf))].sort((a, b) => a - b);
 
       // Left to right the tiles turn in from edge-on to their numbers; right to
