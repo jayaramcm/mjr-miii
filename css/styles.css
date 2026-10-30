@@ -4630,11 +4630,11 @@ body.is-scrolling .hero__content {
   }
 
   .about__pillar--l {
-    left: -5vw;
+    left: calc(-5vw - 20px);
   }
 
   .about__pillar--r {
-    right: -5vw;
+    right: calc(-5vw - 20px);
   }
 
   .about__head {
