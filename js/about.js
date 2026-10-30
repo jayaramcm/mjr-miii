@@ -190,7 +190,7 @@
     const widthShare = isPhone ? 0.86 : 0.435;
     const h = Math.max(120, Math.min(window.innerWidth * widthShare * 592 / 767, vh() * 0.76 * 592 / 767, bottom - top));
     sketch.style.width = (h * 767 / 592) + 'px';
-    sketchRestY = (top + bottom) / 2 - vh() * 0.475;
+    sketchRestY = (top + bottom) / 2 - vh() * 0.475 - (isPhone ? 0 : 28);
   };
   fitSketch();
   ScrollTrigger.addEventListener('refreshInit', fitSketch);
