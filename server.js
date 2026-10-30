@@ -23,6 +23,7 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
   '.ico': 'image/x-icon',
+  '.pdf': 'application/pdf',
 };
 
 const server = http.createServer((req, res) => {
