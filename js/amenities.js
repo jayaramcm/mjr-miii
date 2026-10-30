@@ -157,20 +157,35 @@
     let order = cards.map((_, i) => i);
 
     function getCardTransform(pos, hovered) {
-      // Front card (or before the main Amenities cover lifts up): sit flush at 0
-      if (pos === 0 || !isDealt) {
+      if (isPhone()) {
+        // On mobile: front card (or before dealt) sits flush at 0; once dealt, 3 stepped cards peek behind top edge
+        if (pos === 0 || !isDealt) {
+          return { x: 0, y: 0, rotation: 0, scale: 1 };
+        }
+        const stepIdx = Math.min(pos, 3);
+        const yStep = 8;
+        const scaleStep = 0.042;
+        return {
+          x: 0,
+          y: -(stepIdx * yStep),
+          rotation: 0,
+          scale: 1 - stepIdx * scaleStep,
+        };
+      }
+      // Desktop: when not hovered, all cards sit flush directly behind the front card
+      if (pos === 0 || !hovered) {
         return { x: 0, y: 0, rotation: 0, scale: 1 };
       }
-      // Once dealt: show 3 stepped cards peeking behind the top edge of the main card (Frame 89 cue)
-      const stepIdx = Math.min(pos, 3);
-      const yStep = isPhone() ? 8 : 10;
-      const scaleStep = 0.042;
-      const extraLift = hovered && !isPhone() ? stepIdx * 3 : 0;
+      const sign = pos % 2 === 1 ? 1 : -1;
+      const xOffset = sign * (12 + (pos - 1) * 8);
+      const yOffset = -pos * 10;
+      const rot = sign * (2.2 + (pos - 1) * 1.1);
+      const sc = 1 - pos * 0.012;
       return {
-        x: 0,
-        y: -(stepIdx * yStep + extraLift),
-        rotation: 0,
-        scale: 1 - stepIdx * scaleStep,
+        x: xOffset,
+        y: yOffset,
+        rotation: rot,
+        scale: sc,
       };
     }
 
@@ -477,8 +492,7 @@
   const logoH = () => window.innerWidth * 0.5695;
   const fitShape = () => {
     const h = logoH();
-    const totalH = Math.max(h, vh());
-    shape.style.height = totalH + 'px';
+    shape.style.height = isPhone() ? Math.max(h, vh()) + 'px' : '';
     gsap.set(bldgs[0], { '--t1': (h * 0.4404).toFixed(1) + 'px', '--t2': (h * 0.2301).toFixed(1) + 'px' });
     gsap.set(bldgs[1], { '--t1': (h * 0.2092).toFixed(1) + 'px', '--t2': '0px' });
     gsap.set(bldgs[2], { '--t1': (h * 0.3003).toFixed(1) + 'px', '--t2': (h * 0.6043).toFixed(1) + 'px' });
@@ -515,12 +529,12 @@
   gsap.set(q, { opacity: 0, y: () => Math.min(vh() * 0.25, 120) });
   gsap.set(rule, { scaleY: 0, transformOrigin: 'top center' });
 
-  // Initial 4-card pile: overlapped directly on one another (no diagonal stack offset)
+  // Initial 4-card stack: overlapped on mobile, diagonal peek on desktop
   gsap.set(allDeckCards, {
     xPercent: -50,
     yPercent: -50,
-    x: 0,
-    y: () => vh(),
+    x: (i) => (isPhone() ? 0 : (i - 3) * 14),
+    y: (i) => vh() + (isPhone() ? 0 : (i - 3) * 14),
     zIndex: (i) => (i === 3 ? 10 : isPhone() ? (i === 0 ? 3 : 1) : i + 1),
     rotation: 0,
     opacity: (i) => (isPhone() && i !== 0 && i !== 3 ? 0 : 1),
@@ -594,8 +608,8 @@
       scrub: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        const dealOffset = isPhone() ? 0.15 : 0.6;
-        const dealThreshold = tl.labels['deal'] ? (tl.labels['deal'] + dealOffset) / tl.totalDuration() : 0.78;
+        const dealOffset = isPhone() ? 0.15 : 0.8;
+        const dealThreshold = tl.labels['deal'] ? (tl.labels['deal'] + dealOffset) / tl.totalDuration() : 0.85;
         setDealt(self.progress >= dealThreshold);
       },
     },
@@ -626,13 +640,13 @@
       duration: 1.3,
     }, 'bleed')
 
-  // 5. 4-card deck rises overlapped on one another with Amenities cover on top
+  // 5. 4-card deck rises with Amenities cover on top
     .addLabel('deck', '+=0.3')
     .to(allDeckCards, {
-      y: 0,
+      y: (i) => (isPhone() ? 0 : (i - 3) * 14),
       duration: 1.3,
       ease: 'power3.out',
-      stagger: isPhone() ? 0 : 0.04,
+      stagger: isPhone() ? 0 : 0.06,
     }, 'deck')
 
   // 6. Cover lifts up with angle/tilt off-screen

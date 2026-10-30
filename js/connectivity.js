@@ -75,20 +75,35 @@
   // Scene and panel are set from one shared value every frame, so they always
   // move together and scrolling back simply runs the same maths in reverse
   const renderOutro = (t) => {
+    const isPhone = window.innerWidth <= 760;
     const w = rera.offsetWidth; // the panel's width is exactly how far the scene moves
     const s = slideEase(gsap.utils.clamp(0, 1, (t - HOLD) / SLIDE));
-    const exitY = -slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerHeight * 1.15;
-    gsap.set(scene, { x: -w * s, y: exitY });
-    gsap.set(rera, { x: w * (1 - s) });
-    gsap.set(reraCopy, { x: 0, y: exitY });
     const r = rollEase(gsap.utils.clamp(0, 1, (t - ROLL_AT) / ROLL));
-    const enterY = window.innerHeight * 0.65 * (1 - r);
-    gsap.set(folder, {
-      opacity: 1,
-      x: 0,
-      y: enterY + exitY,
-      rotation: 38 + (-15 - 38) * r,
-    });
+
+    if (isPhone) {
+      const exitY = -slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerHeight * 1.15;
+      const enterY = window.innerHeight * 0.65 * (1 - r);
+      gsap.set(scene, { x: -w * s, y: exitY });
+      gsap.set(rera, { x: w * (1 - s) });
+      gsap.set(reraCopy, { x: 0, y: exitY });
+      gsap.set(folder, {
+        opacity: 1,
+        x: 0,
+        y: enterY + exitY,
+        rotation: 38 + (-15 - 38) * r,
+      });
+    } else {
+      const out = slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerWidth;
+      gsap.set(scene, { x: -w * s - out, y: 0 });
+      gsap.set(rera, { x: w * (1 - s) });
+      gsap.set(reraCopy, { x: -out, y: 0 });
+      gsap.set(folder, {
+        opacity: 1,
+        x: window.innerWidth * 0.45 * (1 - r) + out,
+        y: 0,
+        rotation: 38 + (-15 - 38) * r,
+      });
+    }
   };
   renderOutro(0);
 
