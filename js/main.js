@@ -442,16 +442,9 @@
     gsap.set([photoImg, sketchImg], { scale: 1.05 });
     gsap.set(photoImg, { '--fill': 0 });
     gsap.set(overlay, { opacity: 0 });
-    gsap.set(word, {
-      left: '50%',
-      top: '50%',
-      xPercent: -50,
-      yPercent: -50,
-      y: 0,
-    });
     gsap.set(wordInner, {
       opacity: 0,
-      scale: 1.25,
+      scale: 1.15,
       letterSpacing: '0px',
     });
     gsap.set(logo, { opacity: 0, scale: 1.3 });
@@ -589,18 +582,39 @@
       const ROAD_X0 = 0.1102;
       const ROAD_X1 = 0.8914;
       const ROAD_SPAN = ROAD_X1 - ROAD_X0;
+      const isLaptop14 = () => window.innerWidth > 640 && window.innerWidth <= 1600;
       const planH = () => (window.innerWidth <= 640 ? window.innerWidth * PLAN_W / PLAN_H : window.innerWidth * PLAN_H / PLAN_W);
-      const roadScale = () => (window.innerWidth <= 640
-        ? Math.max(1 / ROAD_SPAN, (window.innerHeight / planH()) / ROAD_SPAN)
-        : 1 / ROAD_SPAN);
-      const roadX = () => (window.innerWidth <= 640
-        ? (window.innerWidth - window.innerWidth * roadScale()) / 2
-        : -ROAD_X0 * window.innerWidth * roadScale());
+      const roadScale = () => {
+        if (window.innerWidth <= 640) {
+          return Math.max(1 / ROAD_SPAN, (window.innerHeight / planH()) / ROAD_SPAN);
+        }
+        if (isLaptop14()) {
+          return Math.min(1 / ROAD_SPAN, window.innerHeight / (0.955 * planH()));
+        }
+        return 1 / ROAD_SPAN;
+      };
+      const roadX = () => {
+        if (window.innerWidth <= 640) {
+          return (window.innerWidth - window.innerWidth * roadScale()) / 2;
+        }
+        if (isLaptop14()) {
+          const s = roadScale();
+          const leftPad = Math.max(0, (window.innerWidth * 0.68 - ROAD_SPAN * window.innerWidth * s) * 0.35);
+          return -ROAD_X0 * window.innerWidth * s + leftPad;
+        }
+        return -ROAD_X0 * window.innerWidth * roadScale();
+      };
       const introY = () => {
         if (window.innerWidth <= 640) {
           return -(1 - ROAD_X1) * planH() * roadScale();
         }
         const scaledH = planH() * roadScale();
+        if (isLaptop14()) {
+          const topPad = 0.040 * scaledH;
+          const botEdge = 0.988 * scaledH;
+          const spanH = botEdge - topPad;
+          return (window.innerHeight - spanH) / 2 - topPad;
+        }
         const centerY = (window.innerHeight - scaledH) / 2;
         const maxBottomY = window.innerHeight - 0.992 * scaledH;
         return Math.max(centerY, maxBottomY);

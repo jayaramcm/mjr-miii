@@ -486,7 +486,8 @@
   // Distance between dealt cards: one card width plus a little extra gap
   const step = () => stacks[0].offsetWidth + (isPhone() ? 24 : Math.max(38, Math.min(68, window.innerWidth * 0.035)));
 
-  const NAV_CLEAR = 110; // keep the heading clear of the logo in the nav bar
+  const isLaptop14 = () => window.innerWidth > 760 && window.innerWidth <= 1600;
+  const navClear = () => (isLaptop14() ? 92 : 110); // keep the heading clear of the logo in the nav bar
   // Elongate the 3-tower shape ONLY on the bottom side on taller viewports (mobile)
   // by measuring the top slanted roof vertices (--t1, --t2) in px from the top at 56.95vw scale.
   const logoH = () => window.innerWidth * 0.5695;
@@ -499,8 +500,11 @@
   };
   // Fit the photo so heading, photo and caption share one screen
   const fitFrame = () => {
-    const room = vh() - NAV_CLEAR - head.offsetHeight - copy.offsetHeight - vh() * 0.07 - 40;
-    const w = Math.max(200, Math.min(window.innerWidth * (isPhone() ? 0.88 : 0.62), 1240, room * 1018 / 558));
+    const nc = navClear();
+    const gapAllowance = isLaptop14() ? vh() * 0.044 + 16 : vh() * 0.07 + 40;
+    const room = vh() - nc - head.offsetHeight - copy.offsetHeight - gapAllowance;
+    const maxW = window.innerWidth * (isPhone() ? 0.88 : isLaptop14() ? 0.682 : 0.62);
+    const w = Math.max(200, Math.min(maxW, 1240, room * 1018 / 558));
     frame.style.width = w + 'px';
     frame.style.height = (w * 558 / 1018 + (isPhone() ? 20 : 0)) + 'px';
   };
@@ -514,14 +518,15 @@
   // Column offset: on desktop puts the heading just under the nav bar;
   // on mobile keeps the entire [heading + image + copy] container center-aligned vertically
   const settleY = () => {
+    const nc = navClear();
     if (isPhone()) {
       const blockTop = head.offsetTop;
       const blockBottom = copy.offsetTop + copy.offsetHeight;
       const blockH = blockBottom - blockTop;
-      const targetTop = Math.max(NAV_CLEAR, (vh() - blockH) / 2 + 16);
+      const targetTop = Math.max(nc, (vh() - blockH) / 2 + 16);
       return targetTop - blockTop;
     }
-    return NAV_CLEAR - head.offsetTop;
+    return nc - head.offsetTop;
   };
 
   gsap.set(shape, { y: () => shape.offsetHeight + 40 });
@@ -626,7 +631,7 @@
   // 3. One continuous scroll of the column and paper texture up to the heading's resting place; line moves up off the screen
     .to(track, { y: settleY, duration: 3.2, ease: 'none' }, '+=0.2')
     .to(navy, { y: settleY, duration: 3.2, ease: 'none' }, '<')
-    .to(rule, { y: () => -(NAV_CLEAR + 120), duration: 1.8, ease: 'power1.in' }, '<+1.2')
+    .to(rule, { y: () => -(navClear() + 120), duration: 1.8, ease: 'power1.in' }, '<+1.2')
     .to(q, { opacity: 0, duration: 0.6, ease: 'none' }, '<+0.4')
 
   // 4. Photo opens to full bleed
