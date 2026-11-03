@@ -1,9 +1,7 @@
-# Videos the page doesn't use (originals replaced by the -scrub versions, older hero clips)
-Assets/Hero-day-and-night-without-watermark.mp4
-Assets/butterfly video.mp4
-Assets/hero-mjr.mp4
-Assets/hero-mjr-2.mp4
-Assets/mjr-location-1.mp4
-Assets/mjr-location-2.mp4
-Assets/mjr-location-3.mp4
-Assets/mjr-location-4.mp4
+node_modules/
+.DS_Store
+Thumbs.db
+_*.html
+_*.mp4
+_*.jpg
+_*.png

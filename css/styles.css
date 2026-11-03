@@ -702,10 +702,17 @@ body.is-scrolling .hero__video {
   transition: opacity 0.7s cubic-bezier(0.65, 0, 0.35, 1), visibility 0s linear 0.7s;
 }
 
-.preloader.is-done svg { transform: scale(0.92); }
+.preloader.is-done svg {
+  transform: scale(0.92);
+}
 
-.pl-ink { fill: var(--pl-ink); }
-.pl-gold { fill: var(--gold); }
+.pl-ink {
+  fill: var(--pl-ink);
+}
+
+.pl-gold {
+  fill: var(--gold);
+}
 
 .pl-tower,
 .pl-letter,
@@ -722,15 +729,37 @@ body.is-scrolling .hero__video {
   animation-name: pl-rise;
 }
 
-.pl-t1 { animation-delay: 0s; }
-.pl-t2 { animation-delay: 0.14s; }
-.pl-t3 { animation-delay: 0.28s; }
+.pl-t1 {
+  animation-delay: 0s;
+}
+
+.pl-t2 {
+  animation-delay: 0.14s;
+}
+
+.pl-t3 {
+  animation-delay: 0.28s;
+}
 
 @keyframes pl-rise {
-  0% { transform: scaleY(0); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
-  30% { transform: scaleY(1); }
-  78% { transform: scaleY(1); animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0); }
-  94%, 100% { transform: scaleY(0); }
+  0% {
+    transform: scaleY(0);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  30% {
+    transform: scaleY(1);
+  }
+
+  78% {
+    transform: scaleY(1);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  }
+
+  94%,
+  100% {
+    transform: scaleY(0);
+  }
 }
 
 /* Letters settle up into place */
@@ -739,15 +768,41 @@ body.is-scrolling .hero__video {
   animation-name: pl-settle;
 }
 
-.pl-m { animation-delay: 0.45s; }
-.pl-j { animation-delay: 0.56s; }
-.pl-r { animation-delay: 0.67s; }
+.pl-m {
+  animation-delay: 0.45s;
+}
+
+.pl-j {
+  animation-delay: 0.56s;
+}
+
+.pl-r {
+  animation-delay: 0.67s;
+}
 
 @keyframes pl-settle {
-  0% { opacity: 0; transform: translateY(26px); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
-  24% { opacity: 1; transform: translateY(0); }
-  70% { opacity: 1; transform: translateY(0); animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0); }
-  84%, 100% { opacity: 0; transform: translateY(-10px); }
+  0% {
+    opacity: 0;
+    transform: translateY(26px);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  24% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  }
+
+  84%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
 /* The gold block drops in last, like a cornerstone */
@@ -758,14 +813,33 @@ body.is-scrolling .hero__video {
 }
 
 @keyframes pl-drop {
-  0% { opacity: 0; transform: rotate(-90deg) scale(0); animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1); }
-  18% { opacity: 1; transform: rotate(0) scale(1); }
-  64% { opacity: 1; transform: rotate(0) scale(1); animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0); }
-  76%, 100% { opacity: 0; transform: rotate(45deg) scale(0); }
+  0% {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  18% {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+
+  64% {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  }
+
+  76%,
+  100% {
+    opacity: 0;
+    transform: rotate(45deg) scale(0);
+  }
 }
 
 /* Reduced motion: no movement, just a soft breathing fade */
 @media (prefers-reduced-motion: reduce) {
+
   .pl-tower,
   .pl-letter,
   .pl-block {
@@ -774,8 +848,15 @@ body.is-scrolling .hero__video {
   }
 
   @keyframes pl-breathe {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.45; }
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.45;
+    }
   }
 }
 
@@ -849,7 +930,7 @@ body.is-loaded .mask>span {
 }
 
 .hero__lede {
-  max-width: 34rem;
+  max-width: 36rem;
   margin: 1.5rem 0 0;
   font-size: clamp(0.98rem, 1.2vw, 1.1rem);
   font-weight: 300;
@@ -1391,21 +1472,8 @@ body.is-scrolling .hero__content {
   z-index: 3;
   overflow: hidden;
   clip-path: inset(0 0 0 100%);
-  background: #36512B;
+  background: #1C2D5C;
   will-change: clip-path;
-}
-
-/* Grass ground layer */
-.has-why-pin .mplan__img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 120%;
-  max-width: none;
-  height: 100%;
-  object-fit: cover;
-  transform-origin: 50% 50%;
-  will-change: transform;
 }
 
 /* Masterplan layer: sized to 100vw, positioned/zoomed by JS (x, y, scale from 0 0) */
@@ -1414,9 +1482,22 @@ body.is-scrolling .hero__content {
   left: 0;
   top: 0;
   width: 100vw;
-  aspect-ratio: 1606 / 979;
+  aspect-ratio: 2560 / 1440;
   transform-origin: 0 0;
   --inv: 1;
+}
+
+/* Grass ground behind the layout: stays put while the layout pans and zooms,
+   easing in only slightly when a plot is selected (js/main.js) */
+.mplan__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  pointer-events: none;
 }
 
 
@@ -1425,7 +1506,27 @@ body.is-scrolling .hero__content {
   display: block;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 18px 30px rgba(12, 12, 12, 0.35));
+}
+
+/* Selected plot, filled to its exact drawn shape on the plan (js/main.js) */
+.mplan__shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.mplan__shape polygon {
+  fill: #CF9E39; /* selected plot */
+  stroke: none;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+}
+
+.mplan__shape polygon.is-on {
+  opacity: 1;
 }
 
 .mplan__pins {
@@ -1519,6 +1620,21 @@ body.is-scrolling .hero__content {
 
 .pin.is-filtered-out {
   display: none !important;
+}
+
+/* Reserved plots (EV charging station, not for sale): the tile stays on the plan
+   in grey with a dashed edge, and can't be clicked */
+.pin.is-reserved,
+.mplan.is-zoomed .pin.is-reserved {
+  background: #D9D6CE;
+  color: #6B6B6B;
+  border: 1.5px dashed #6B6B6B;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.pin.is-reserved:hover {
+  box-shadow: none;
 }
 
 /* When masterplan is zoomed in to inspect a plot: numbers become big, crisp, high-contrast and very easy to read */
@@ -1631,8 +1747,15 @@ body.is-scrolling .hero__content {
 }
 
 @keyframes exploreGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(202, 152, 44, 0); }
-  50% { box-shadow: 0 0 22px 4px rgba(202, 152, 44, 0.55), 0 0 0 2px rgba(202, 152, 44, 0.35); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(202, 152, 44, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 22px 4px rgba(202, 152, 44, 0.55), 0 0 0 2px rgba(202, 152, 44, 0.35);
+  }
 }
 
 .pcard__explore:hover {
@@ -1961,6 +2084,15 @@ body.is-scrolling .hero__content {
   color: rgba(72, 72, 72, 0.65) !important;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* Reserved plots keep a readable, distinct tile instead of fading out */
+.pcard__grid button.is-reserved {
+  opacity: 1 !important;
+  background: #D9D6CE !important;
+  color: #6B6B6B !important;
+  outline: 1.5px dashed #6B6B6B;
+  outline-offset: -3px;
 }
 
 .pcard__grid .pcard__empty {
@@ -2833,11 +2965,6 @@ body.is-scrolling .hero__content {
     clip-path: inset(100% 0 0 0);
   }
 
-  .has-why-pin .mplan__img {
-    width: 100%;
-    height: 120%;
-  }
-
   .has-why-pin .mplan__label {
     right: 1.25rem;
     bottom: calc(9svh + 1.25rem);
@@ -2849,17 +2976,18 @@ body.is-scrolling .hero__content {
     display: none;
   }
 
-  /* Rotate Top-Down Residential Landscape Masterplan.png by -90deg so the 150 ft road is on the right side */
+  /* Rotate the watercolour plan by -90deg so the 150 ft road is on the right side */
   .mplan__stage {
-    aspect-ratio: 979 / 1606;
+    aspect-ratio: 1440 / 2560;
   }
 
-  .mplan__plan {
+  .mplan__plan,
+  .mplan__shape {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(100% * 1606 / 979);
-    height: calc(100% * 979 / 1606);
+    width: calc(100% * 2560 / 1440);
+    height: calc(100% * 1440 / 2560);
     max-width: none;
     transform: translate(-50%, -50%) rotate(-90deg);
   }
@@ -4152,8 +4280,26 @@ body.is-scrolling .hero__content {
 }
 
 .conn__header {
+  position: relative;
   padding: clamp(3rem, 6vw, 6rem) var(--gutter) clamp(1rem, 2vw, 2rem);
   text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(16, 42, 84, 0.25);
+  z-index: 2; /* sky's cloud bank paints over the top of the video stage */
+}
+
+/* Sky behind the header; its soft cloud bank hangs past the header's bottom
+   edge and fades into the first video frame's sky */
+.conn__header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * clamp(60px, 10vw, 220px));
+  z-index: -1;
+  background: url("../Assets/sky-cloud-bank.png") center bottom / cover no-repeat;
+  pointer-events: none;
 }
 
 .conn__title {
@@ -4161,7 +4307,7 @@ body.is-scrolling .hero__content {
   font: 400 clamp(1.8rem, 3.8vw, 4.8rem) / 1.15 var(--f-display);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--navy-900);
+  color: #fff;
 }
 
 .conn__line {
@@ -4177,14 +4323,14 @@ body.is-scrolling .hero__content {
   max-width: 64vw;
   margin: 0 auto 2.4vw;
   font: 300 clamp(0.95rem, 1.2vw, 1.5rem) / 1.6 var(--f-ui);
-  color: #484848;
+  color: #fff;
 }
 
 .conn__tagline {
   max-width: 62vw;
   margin: 0 auto;
   font: 600 clamp(1.1rem, 1.9vw, 2.4rem) / 1.35 var(--f-ui);
-  color: #484848;
+  color: #fff;
 }
 
 .conn__stage {
@@ -4332,19 +4478,24 @@ body.is-scrolling .hero__content {
   top: 11vh;
   width: clamp(260px, 25vw, 520px);
   padding: clamp(28px, 2.9vw, 56px);
-  background: var(--navy-900);
-  color: #F5F1E8;
+  background: #F5F1E8;
+  color: #484848;
   opacity: 0;
   box-shadow: 0 30px 60px -20px rgba(29, 40, 86, 0.45);
+  isolation: isolate; /* keeps the texture layer behind the text */
 }
 
-.conn__card::before {
+/* Paper texture over the ivory, at 80% */
+.conn__card::after {
   content: "";
   position: absolute;
-  inset: clamp(14px, 1.45vw, 28px);
-  border: 2px solid #CA982C;
+  inset: 0;
+  z-index: -1;
+  background: url("../Assets/paper-texture.png") center / 240px auto;
+  opacity: 0.8;
   pointer-events: none;
 }
+
 
 .conn__card-title {
   margin: 0 0 1.1vw;
@@ -4378,9 +4529,6 @@ body.is-scrolling .hero__content {
     width: 78vw;
   }
 
-  .conn__card::before {
-    border-width: 1px;
-  }
 }
 
 
@@ -4440,8 +4588,8 @@ body.is-scrolling .hero__content {
   padding: 0 0 clamp(4rem, 8vw, 8rem);
 }
 
-/* Pinned About stage. Pillar sizes follow the screen height so they always
-   reach top to bottom; js/about.js zooms and lifts them */
+/* Pinned About stage: title and layout sketches on cream, then the aerial
+   view behind a stack of five paper cards (js/about.js) */
 .about__stage {
   position: relative;
   height: 100vh;
@@ -4450,47 +4598,20 @@ body.is-scrolling .hero__content {
   background: #F5F1E8;
 }
 
-.about__ink {
+/* Aerial view: revealed through the ink as it bleeds open (js/about.js) */
+.about__bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  /* drawn at quarter size and stretched; smoothing softens the blot edges */
-  image-rendering: auto;
-}
-
-/* Pillar layer: revealed through the ink as it spreads (js/about.js) */
-.about__pillars {
-  position: absolute;
-  inset: 0;
+  object-fit: cover;
   visibility: hidden;
-  pointer-events: none;
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-}
-
-.about__pillar {
-  position: absolute;
-  top: -8vh;
-  height: 160vh;
-  width: auto;
-  max-width: none;
-  pointer-events: none;
-}
-
-/* The column sits in the middle of its image; js/about.js centres the image
-   on the screen edge so half a column shows. The right one
-   is not mirrored, so both show the same lit side */
-.about__pillar--l {
-  left: 0;
-  transform-origin: 50% 30%;
-}
-
-.about__pillar--r {
-  right: 0;
-  transform-origin: 50% 30%;
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 .about__head {
@@ -4509,7 +4630,7 @@ body.is-scrolling .hero__content {
   color: var(--navy-900);
 }
 
-/* Paper fades in under the sketches; the ink canvas paints over it */
+/* Paper fades in under the sketches; the aerial view later fades in over it */
 .about__paper {
   position: absolute;
   inset: 0;
@@ -4557,97 +4678,293 @@ body.is-scrolling .hero__content {
   font-weight: 600;
 }
 
-/* Question top left, answer bottom right, inside the pillars (1920px layout) */
-.about__question,
-.about__answer {
-  position: absolute;
-  margin: 0;
-  color: #F5F1E8;
-}
 
-.about__question {
-  left: 8.3vw;
-  top: 27%;
-  max-width: 47vw;
-  font: 400 clamp(1.25rem, 2.3vw, 2.9rem) / 1.3 var(--f-ui);
-}
-
-.about__question strong {
-  font-weight: 600;
-}
-
-.about__answer {
-  right: 8.9vw;
-  top: 78%;
-  max-width: 48vw;
-  text-align: right;
-  font: 300 clamp(0.95rem, 1.65vw, 2.1rem) / 1.35 var(--f-ui);
-}
-
-@media (max-width: 760px) {
-  .about__question {
-    left: 17vw;
-    right: 17vw;
-    max-width: none;
-  }
-
-  .about__answer {
-    left: 17vw;
-    right: 17vw;
-    max-width: none;
-  }
-}
-
-/* Since 2012 and each fact share one style and one spot in the centre,
-   and take turns there (js/about.js) */
-.about__since,
-.about__facts li {
+/* All cards share one grid cell, so they match the tallest card's height.
+   Sizes follow the 1920px design (card about 920px wide) */
+.about__deck {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 76vw;
-  margin: 0;
-  text-align: center;
-  font: 400 clamp(2.2rem, 5.4vw, 7rem) / 1.1 var(--f-display);
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0;
+  display: grid;
+  width: min(48vw, 940px);
 }
 
-.about__facts {
-  list-style: none;
-  position: absolute;
-  inset: 0;
+.about__card {
+  grid-area: 1 / 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 2.6vw, 50px) clamp(30px, 2.6vw, 50px) clamp(24px, 2vw, 40px);
+  background: #F5F1E8 url("../Assets/paper-texture.png") center / 240px auto;
+  border: 1px solid rgba(66, 66, 66, 0.25);
+  box-shadow: 0 24px 50px -18px rgba(12, 12, 12, 0.5);
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+
+.about__q,
+.about__a {
   margin: 0;
-  padding: 0;
-  pointer-events: none;
+}
+
+.about__q {
+  font: 500 clamp(1.2rem, 2.05vw, 2.5rem) / 1.32 var(--f-ui);
+  color: var(--navy-900);
+}
+
+.about__q span {
+  font-weight: 700;
+}
+
+/* The four Our Story facts: one line each, all in the same face and size,
+   centred in the space above the footer */
+.about__fact {
+  margin: auto 0;
+  text-align: center;
+  font: 400 clamp(1.8rem, 3.4vw, 4.2rem) / 1.15 var(--f-display);
+  text-transform: uppercase;
+  color: var(--navy-900);
+}
+
+.about__fact + .about__foot {
+  margin-top: 0;
+}
+
+.about__a {
+  margin-top: 0.5em;
+  font: 400 clamp(1rem, 1.75vw, 2.15rem) / 1.4 var(--f-ui);
+  color: #484848;
+}
+
+.about__a span {
+  font-weight: 600;
+}
+
+/* Tag and kind sit on the bottom edge of every card */
+.about__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: clamp(16px, 1.6vw, 30px);
+  font: 400 clamp(0.85rem, 1.3vw, 1.6rem) / 1.2 var(--f-ui);
+}
+
+.about__tag {
+  color: #8a8a8a;
+}
+
+.about__kind {
+  color: #424242;
 }
 
 @media (max-width: 760px) {
-  .about__pillar {
-    height: 150vh;
-    top: -10vh;
-  }
-
-  .about__pillar--l {
-    left: calc(-5vw - 20px);
-  }
-
-  .about__pillar--r {
-    right: calc(-5vw - 20px);
-  }
-
   .about__head {
     width: 84vw;
   }
 
-  .about__since,
-  .about__facts li {
-    width: min(72vw, 11.5ch);
-    font-size: clamp(1.75rem, 6.8vw, 2.2rem);
-    line-height: 1.18;
-    text-wrap: balance;
+  .about__deck {
+    width: 88vw;
   }
+
+  .about__card {
+    padding: 30px 28px 24px;
+  }
+
+}
+
+/* Option B: Split-screen ivory #F5F1E8 layout with scroll-revealed facts
+   and construction video (Option A preserved in DOM when data-about-opt="a") */
+.about__split {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.about[data-about-opt="a"] .about__split {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.about[data-about-opt="b"] .about__split {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.about[data-about-opt="b"] .about__deck,
+.about[data-about-opt="b"] .about__bg {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.about__split-copy {
+  position: relative;
+  z-index: 9;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.about__split-qa {
+  position: absolute;
+  top: clamp(120px, 16vh, 195px);
+  left: 5.5vw;
+  max-width: min(39vw, 660px);
+  will-change: transform, opacity;
+}
+
+.about__split-q {
+  margin: 0;
+  font: 500 clamp(1.1rem, 1.7vw, 2.15rem) / 1.32 var(--f-ui);
+  color: var(--navy-900);
+}
+
+.about__split-q span {
+  font-weight: 600;
+}
+
+.about__split-a {
+  margin: clamp(8px, 0.9vw, 15px) 0 0;
+  font: 300 clamp(0.95rem, 1.32vw, 1.62rem) / 1.4 var(--f-ui);
+  color: #484848;
+}
+
+.about__split-a span {
+  font-weight: 600;
+  color: #565656;
+}
+
+.about__split-facts-wrap {
+  position: absolute;
+  left: 5.5vw;
+  bottom: clamp(48px, 10.5vh, 130px);
+}
+
+.about__split-facts-head {
+  margin: 0 0 clamp(10px, 1.15vw, 20px);
+  font: 600 clamp(0.95rem, 1.2vw, 1.4rem) / 1.2 var(--f-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--navy-900);
+  will-change: transform, opacity;
+}
+
+.about__split-facts {
+  margin: 0;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+
+.about__split-facts li {
+  font: 400 clamp(1.35rem, 2.65vw, 3.3rem) / 1.38 var(--f-display);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: #424242;
+  will-change: transform, opacity;
+}
+
+.about__split-facts li::marker {
+  color: #424242;
+  font-size: 0.65em;
+}
+
+.about__split-media {
+  position: absolute;
+  right: -3.5vw;
+  top: 2vh;
+  bottom: 2vh;
+  width: 65vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about__video {
+  position: relative;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(1.1);
+  transform-origin: center center;
+  mix-blend-mode: darken;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Switcher hidden in production while preserving Option A & B support */
+.about__opts {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .about__split-qa {
+    top: clamp(92px, 12vh, 136px);
+    max-width: 44vw;
+  }
+
+  .about__split-media {
+    right: -4vw;
+    width: 62vw;
+  }
+
+  .about__split-facts li {
+    font-size: clamp(1.2rem, 2.3vw, 2.4rem);
+  }
+}
+
+@media (max-width: 760px) {
+  .about__split-qa {
+    top: 84px;
+    left: 6vw;
+    right: 6vw;
+    max-width: none;
+  }
+
+  .about__split-q {
+    font-size: clamp(1.05rem, 4.4vw, 1.35rem);
+  }
+
+  .about__split-a {
+    font-size: clamp(0.9rem, 3.6vw, 1.08rem);
+  }
+
+  .about__split-media {
+    right: 0;
+    left: 0;
+    top: 25vh;
+    bottom: auto;
+    width: 100vw;
+    height: 40vh;
+  }
+
+  .about__video {
+    transform: scale(1.06);
+  }
+
+  .about__split-facts-wrap {
+    left: 6vw;
+    right: 6vw;
+    bottom: 28px;
+  }
+
+  .about__split-facts-head {
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+  }
+
+  .about__split-facts li {
+    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
+    line-height: 1.32;
+  }
+}
+
+.letter__env {
+  z-index: 15;
 }
 
 /* Letter: built from illoca's envelope. The top flap is hinged on its bottom
@@ -4785,19 +5102,6 @@ body.is-scrolling .hero__content {
   }
 }
 
-/* The facts sit a touch smaller than Since 2012 */
-.about__facts li {
-  font-size: calc(clamp(2.2rem, 5.4vw, 7rem) - 14px);
-}
-
-@media (max-width: 760px) {
-  .about__facts li {
-    font-size: clamp(1.75rem, 6.8vw, 2.2rem);
-    max-width: 11.5ch;
-    text-wrap: balance;
-  }
-}
-
 .about__h3 {
   margin: 0 0 1.2rem;
   font: 400 clamp(1.4rem, 2vw, 2.4rem) / 1.2 var(--f-display);
@@ -4823,13 +5127,6 @@ body.is-scrolling .hero__content {
   color: #F5F1E8;
 }
 
-.about__quote::before {
-  content: "";
-  position: absolute;
-  inset: clamp(12px, 1.2vw, 22px);
-  border: 1px solid rgba(202, 152, 44, 0.7);
-  pointer-events: none;
-}
 
 .about__mark {
   display: block;
@@ -5090,7 +5387,8 @@ body.is-scrolling .hero__content {
   margin: 0 0 clamp(1rem, 1.6vw, 1.8rem);
   font: 400 clamp(2rem, 3.9vw, 4.8rem) / 1.1 var(--f-display);
   text-transform: uppercase;
-  white-space: nowrap; /* one line on desktop; wraps on phones (below) */
+  white-space: nowrap;
+  /* one line on desktop; wraps on phones (below) */
   color: var(--navy-900);
 }
 

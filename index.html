@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet">
   <link rel="preload" as="video" href="Assets/hero-day-and-night.mp4" type="video/mp4">
-  <link rel="stylesheet" href="css/styles.css?v=115">
+  <link rel="stylesheet" href="css/styles.css?v=138">
 </head>
 <body>
   <!-- Preloader: the MJR mark builds itself. Shown on first load and between
@@ -36,7 +36,7 @@
           <span class="nav__menu-icon" aria-hidden="true"><span></span><span></span></span>
           <span class="nav__menu-label">Menu</span>
         </button>
-        <a class="nav__text-link nav__brochure" id="navBrochureBtn" href="Assets/MJR_Brochure_V2.pdf" download="MJR_Brochure_V2.pdf">Download Brochure</a>
+        <a class="nav__text-link nav__brochure" id="navBrochureBtn" href="Assets/mjr-brochure.pdf" download="MJR_Township_Brochure.pdf">Download Brochure</a>
       </div>
 
       <a class="nav__logo" href="#top" aria-label="MJR Township, back to top">
@@ -91,7 +91,7 @@
         <a class="menu__home" id="menuHome" href="#top" aria-label="MJR Township, back to the top"><img class="menu__brand" src="Assets/TownShip logo_White.svg" alt="" decoding="async"></a>
         <div class="menu__actions">
           <button class="btn btn--gold" type="button" data-open-booking="visit">Schedule a Site Visit</button>
-          <a class="btn btn--line-light" href="Assets/MJR_Brochure_V2.pdf" download="MJR_Brochure_V2.pdf">Download Brochure</a>
+          <a class="btn btn--line-light" href="Assets/mjr-brochure.pdf" download="MJR_Township_Brochure.pdf">Download Brochure</a>
         </div>
         <dl class="menu__info">
           <div>
@@ -230,9 +230,14 @@
             </li>
           </ul>
           <div class="mplan" id="mplan">
-            <img class="mplan__img" src="Assets/Top-Down Grassy Landscape with Shrubs.png" alt="" aria-hidden="true" decoding="async">
+            <!-- Grass ground: fills the frame and only eases in a little when a plot is selected (js/main.js) -->
+            <img class="mplan__img" src="Assets/Lush Grassland Garden Clusters.png" alt="" aria-hidden="true" decoding="async">
             <div class="mplan__stage" id="planStage">
-              <img class="mplan__plan" src="Assets/Top-Down Residential Landscape Masterplan.png" alt="MJR Township master layout: 104 plots between 30 ft and 40 ft internal roads, facing the 150 ft main road" decoding="async">
+              <img class="mplan__plan" src="Assets/layout MJR.png" alt="MJR Township master layout: 104 plots in blocks between the internal roads, with the green and water zones, facing the 150 ft main road" decoding="async">
+              <!-- Fill of the selected plot, traced from the layout image (2560 x 1440 frame) -->
+              <svg class="mplan__shape" viewBox="0 0 2560 1440" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <polygon id="planShape" points=""></polygon>
+              </svg>
             </div>
             <div class="mplan__pins" id="planPins" aria-label="Plots on the master plan"></div>
 
@@ -319,24 +324,24 @@
                               <span class="pcard__radio-text">All Sizes</span>
                             </label>
                             <label class="pcard__radio-item">
-                              <input type="radio" name="fSize" value="160-200">
+                              <input type="radio" name="fSize" value="0-200.4">
                               <span class="pcard__radio-circle"></span>
-                              <span class="pcard__radio-text">160 – 200 Sq. Yd</span>
+                              <span class="pcard__radio-text">Up to 200 Sq. Yd</span>
                             </label>
                             <label class="pcard__radio-item">
-                              <input type="radio" name="fSize" value="201-300">
+                              <input type="radio" name="fSize" value="200.5-300.4">
                               <span class="pcard__radio-circle"></span>
                               <span class="pcard__radio-text">201 – 300 Sq. Yd</span>
                             </label>
                             <label class="pcard__radio-item">
-                              <input type="radio" name="fSize" value="301-400">
+                              <input type="radio" name="fSize" value="300.5-400.4">
                               <span class="pcard__radio-circle"></span>
                               <span class="pcard__radio-text">301 – 400 Sq. Yd</span>
                             </label>
                             <label class="pcard__radio-item">
-                              <input type="radio" name="fSize" value="401+">
+                              <input type="radio" name="fSize" value="400.5-9999">
                               <span class="pcard__radio-circle"></span>
-                              <span class="pcard__radio-text">400+ Sq. Yd</span>
+                              <span class="pcard__radio-text">401+ Sq. Yd</span>
                             </label>
                           </div>
                         </div>
@@ -416,7 +421,7 @@
 
                     <div class="pcard__filter-footer">
                       <button class="pcard__filter-reset" id="filterResetBtn" type="button">Clear all</button>
-                      <span class="pcard__filter-count" id="filterCount">104 plots matching</span>
+                      <span class="pcard__filter-count" id="filterCount">100 plots matching</span>
                       <button class="pcard__filter-apply" id="filterApplyBtn" type="button">Apply</button>
                     </div>
                   </div>
@@ -450,7 +455,8 @@
                   <div class="pcard__strip-row">
                     <span class="pcard__legend-item"><i class="pcard__legend-box pcard__legend-box--avail"></i> Available</span>
                     <span class="pcard__legend-item"><i class="pcard__legend-box" style="background:#ca982c;"></i> Sold</span>
-                    <span class="pcard__legend-item"><i class="pcard__legend-box" style="background:#36512b;"></i> Selected</span>
+                    <span class="pcard__legend-item"><i class="pcard__legend-box" style="background:#CF9E39;"></i> Selected</span>
+                    <span class="pcard__legend-item"><i class="pcard__legend-box" style="background:#D9D6CE; outline:1.5px dashed #6B6B6B; outline-offset:-2px;"></i> EV Station / Not for sale</span>
                   </div>
                 </div>
               </aside>
@@ -673,7 +679,7 @@
 
     <!-- 04. Location: Where Connectivity Meets Convenience -->
     <section class="conn" id="location" aria-labelledby="connTitle">
-      <header class="conn__header">
+      <header class="conn__header" data-nav="light">
         <h2 class="conn__title" id="connTitle">
           <span class="conn__line"><span>Where connectivity meets</span></span>
           <span class="conn__line"><span>convenience.</span></span>
@@ -741,16 +747,14 @@
     </section>
 
     <!-- 12. About: the team behind the foundation -->
-    <section class="about" id="about" aria-labelledby="aboutTitle">
-      <!-- Pinned stage: title blurs in on cream, navy ink spreads from random spots,
-           marble pillars rise at the edges, then Since 2012 and the three facts (js/about.js) -->
+    <section class="about" id="about" aria-labelledby="aboutTitle" data-about-opt="b">
+      <!-- Pinned stage: title blurs in on cream, moves up as the layout sketches
+           slide in and turn, with the two lines below; then the aerial view fades
+           in, a stack of cards lands in the centre and each scroll sends the top
+           card up as the view eases in; then the leadership letter (js/about.js) -->
       <div class="about__stage">
         <img class="about__paper" src="Assets/paper-texture-2.png" alt="" aria-hidden="true" decoding="async" data-nav="light">
-        <canvas class="about__ink" aria-hidden="true"></canvas>
-        <div class="about__pillars" aria-hidden="true" data-nav="navy">
-          <img class="about__pillar about__pillar--l" src="Assets/Ornate Marble Corinthian Column.png" alt="" decoding="async">
-          <img class="about__pillar about__pillar--r" src="Assets/Ornate Marble Corinthian Column.png" alt="" decoding="async">
-        </div>
+        <img class="about__bg" src="Assets/23.png" alt="" aria-hidden="true" decoding="async">
         <div class="about__head">
           <h2 class="about__title" id="aboutTitle">The team behind the foundation.</h2>
         </div>
@@ -763,14 +767,54 @@
           <p class="about__line">MJR Infra Developers believes good land deserves careful planning.</p>
           <p class="about__line about__line--strong">Every layout begins with a simple question</p>
         </div>
-        <p class="about__question">How will people live here, <strong>five and ten years from now?</strong></p>
-        <p class="about__answer">Roads, open spaces and plot sizes are planned around that answer.</p>
-        <p class="about__since">Since 2012</p>
-        <ul class="about__facts" aria-label="MJR Infra Developers in numbers">
-          <li>12+ years of experience</li>
-          <li>9 projects delivered</li>
-          <li>1,200+ families served</li>
-        </ul>
+        <div class="about__deck">
+          <article class="about__card">
+            <p class="about__q"><span>Q.</span> How will people live here, five and ten years from now?</p>
+            <p class="about__a"><span>A.</span> Roads, open spaces and plot sizes are planned around that answer.</p>
+            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">The Question</span></footer>
+          </article>
+          <article class="about__card">
+            <p class="about__fact">Since 2012</p>
+            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
+          </article>
+          <article class="about__card">
+            <p class="about__fact">12+ Years of experience</p>
+            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
+          </article>
+          <article class="about__card">
+            <p class="about__fact">9 Projects delivered</p>
+            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
+          </article>
+          <article class="about__card">
+            <p class="about__fact">1,200+ Families served</p>
+            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
+          </article>
+        </div>
+        <!-- Option B: Plain ivory #F5F1E8 split view with scroll-revealed facts and construction video -->
+        <div class="about__split" data-nav="light">
+          <div class="about__split-copy">
+            <div class="about__split-qa">
+              <p class="about__split-q"><span>Q.</span> How will people live here, five and ten years from now?</p>
+              <p class="about__split-a"><span>A.</span> Roads, open spaces and plot sizes are planned around that answer.</p>
+            </div>
+            <div class="about__split-facts-wrap">
+              <h3 class="about__split-facts-head">Our Track Record</h3>
+              <ul class="about__split-facts">
+                <li>SINCE 2012</li>
+                <li>12+ YEARS OF EXPERIENCE</li>
+                <li>9 PROJECTS DELIVERED</li>
+                <li>1,200+ FAMILIES SERVED</li>
+              </ul>
+            </div>
+          </div>
+          <div class="about__split-media">
+            <video class="about__video" id="aboutVideo" src="Assets/construction-video-scrub.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+          </div>
+        </div>
+        <div class="about__opts" role="group" aria-label="Facts layout options" hidden>
+          <button type="button" class="about__opt" data-about-opt="a" aria-pressed="false">Option A</button>
+          <button type="button" class="about__opt is-active" data-about-opt="b" aria-pressed="true">Option B</button>
+        </div>
         <div class="letter__env">
           <div class="letter__body">
             <svg class="letter__flap" viewBox="0 0 945 151" aria-hidden="true"><path d="M20.2769 8.59038L0 151H944.5L926.601 8.75157C925.972 3.75087 921.72 0 916.679 0H30.177C25.1988 0 20.9786 3.66182 20.2769 8.59038Z" fill="#DFD0B3"/><path d="M943.934 150.5L926.105 8.81445C925.508 4.06387 921.468 0.500121 916.68 0.5H30.1768C25.4475 0.500127 21.4381 3.97909 20.7715 8.66113L0.576172 150.5H943.934Z" stroke="#424242" stroke-opacity="0.3" fill="none"/></svg>
@@ -989,11 +1033,11 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
-  <script src="js/plots-data.js?v=4" defer></script>
-  <script src="js/main.js?v=58" defer></script>
+  <script src="js/plots-data.js?v=10" defer></script>
+  <script src="js/main.js?v=66" defer></script>
   <script src="js/amenities.js?v=23" defer></script>
   <script src="js/connectivity.js?v=18" defer></script>
-  <script src="js/about.js?v=27" defer></script>
-  <script src="js/sections.js?v=11" defer></script>
+  <script src="js/about.js?v=35" defer></script>
+  <script src="js/sections.js?v=14" defer></script>
 </body>
 </html>

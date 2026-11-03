@@ -582,36 +582,30 @@
         scale: 0.9,
         transformPerspective: 1200,
       });
-      const ROAD_SCALE = 1606 / 1540;
-      const roadScale = () => {
-        if (window.innerWidth <= 640) {
-          return Math.max(ROAD_SCALE, window.innerHeight / (window.innerWidth * 1540 / 979));
-        }
-        return ROAD_SCALE;
-      };
-      const roadX = () => {
-        if (window.innerWidth <= 640) {
-          return -0.07 * window.innerWidth * roadScale();
-        }
-        return -(45 / 1540) * window.innerWidth;
-      };
-      const roadPullStart = () => roadX() + window.innerWidth * 0.18;
-      const grassPullStart = () => window.innerWidth * 0.18;
+      // The layout (2560 x 1440, turned upright on phones) is scaled so the
+      // 150 ft main road spans edge-to-edge across the screen (~78.2% of image width)
+      const PLAN_W = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_W : 2560;
+      const PLAN_H = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_H : 1440;
+      const ROAD_X0 = 0.1102;
+      const ROAD_X1 = 0.8914;
+      const ROAD_SPAN = ROAD_X1 - ROAD_X0;
+      const planH = () => (window.innerWidth <= 640 ? window.innerWidth * PLAN_W / PLAN_H : window.innerWidth * PLAN_H / PLAN_W);
+      const roadScale = () => (window.innerWidth <= 640
+        ? Math.max(1 / ROAD_SPAN, (window.innerHeight / planH()) / ROAD_SPAN)
+        : 1 / ROAD_SPAN);
+      const roadX = () => (window.innerWidth <= 640
+        ? (window.innerWidth - window.innerWidth * roadScale()) / 2
+        : -ROAD_X0 * window.innerWidth * roadScale());
       const introY = () => {
         if (window.innerWidth <= 640) {
-          return -(21 / 1540) * window.innerHeight;
+          return -(1 - ROAD_X1) * planH() * roadScale();
         }
-        const h = window.innerWidth * 979 / 1540;
-        const vh = window.innerHeight;
-        // Start 7% into the image at the top
-        const base = -0.07 * h;
-        // Bottom road starts around 0.76 * h; ensure at least 65px is visible above vh
-        const roadY = 0.76 * h;
-        if (base + roadY > vh - 65) {
-          return vh - 65 - roadY;
-        }
-        return base;
+        const scaledH = planH() * roadScale();
+        const centerY = (window.innerHeight - scaledH) / 2;
+        const maxBottomY = window.innerHeight - 0.992 * scaledH;
+        return Math.max(centerY, maxBottomY);
       };
+      const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 
       gsap.set(mplan, {
         clipPath: window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
@@ -622,13 +616,6 @@
         scale: roadScale,
         transformOrigin: '0 0',
       });
-      gsap.set(mplanImg, {
-        x: () => window.innerWidth <= 640 ? 0 : grassPullStart(),
-        y: () => window.innerWidth <= 640 ? window.innerHeight * 0.18 : 0,
-        scale: 1,
-        transformOrigin: '50% 50%',
-      });
-
       const explorer = initExplorer({ mplan: mplanEl, mplanImg, stage, card, openBooking, roadX, introY, roadScale });
 
       const whyTl = gsap.timeline({
@@ -720,10 +707,9 @@
         .fromTo(mplanLabel, { opacity: 0, x: 40, y: 0 }, { opacity: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.out' }, 'ms+=0.2')
         .to({}, { duration: 0.4 })
 
-        // Pulled open: the strip's edge sweeps left (or up on mobile) to fill the screen, and both
-        // the grassy background and the layout map slide in together
+        // Pulled open: the strip's edge sweeps left (or up on mobile) to fill the screen
+        // as the plan slides in with it
         .to(mplan, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'power2.inOut' }, 'mp')
-        .to(mplanImg, { x: 0, y: 0, duration: 1.8, ease: 'power2.inOut' }, 'mp')
         .to(stage, { x: roadX, y: introY, scale: roadScale, duration: 1.8, ease: 'power2.inOut' }, 'mp')
         .to(mplanLabel, {
           x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * STRIP,
@@ -786,6 +772,13 @@
     const pinsEl = document.getElementById('planPins');
     const grid = document.getElementById('plotGrid');
     const pop = document.getElementById('plotPop');
+    const shape = document.getElementById('planShape');
+    // Outline the selected plot to its exact drawn shape (none for plots without one)
+    const showShape = (p) => {
+      if (!shape) return;
+      if (p && p.shape) shape.setAttribute('points', p.shape);
+      shape.classList.toggle('is-on', !!(p && p.shape));
+    };
     const pageLabel = document.getElementById('pageLabel');
     const prev = document.getElementById('pagePrev');
     const next = document.getElementById('pageNext');
@@ -824,12 +817,12 @@
     };
 
     const matches = (p) => {
+      if (p.reserved) return false; // EV station and plots not for sale are never offered
       if (filterState.availableOnly && p.sold) return false;
       if (filterState.size !== 'all') {
-        if (filterState.size === '160-200' && (p.size < 160 || p.size > 200.4)) return false;
-        if (filterState.size === '201-300' && (p.size < 200.5 || p.size > 300.4)) return false;
-        if (filterState.size === '301-400' && (p.size < 300.5 || p.size > 400.4)) return false;
-        if (filterState.size === '401+' && p.size < 400.5) return false;
+        // option values are "min-max" in sq. yards
+        const [lo, hi] = filterState.size.split('-').map(Number);
+        if (p.size < lo || p.size > hi) return false;
       }
       if (filterState.direction !== 'all') {
         if (!p.facing.includes(filterState.direction)) return false;
@@ -862,18 +855,25 @@
       renderGrid();
     };
 
-    /* Pins on the plan (rendered in crisp screen-space) */
+    /* Pins on the plan (rendered in crisp screen-space). Reserved plots (EV
+       charging station, not for sale) keep their tile but can't be selected. */
+    const statusText = (p) => (p.reserved ? `${p.reserved.toLowerCase()}, not available` : p.sold ? 'sold out' : 'available');
     const pins = {};
     data.list.forEach((p) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'pin' + (p.sold ? ' is-sold' : '');
+      b.className = 'pin' + (p.sold ? ' is-sold' : '') + (p.reserved ? ' is-reserved' : '');
       b.textContent = p.n;
-      b.setAttribute('aria-label', `Plot ${p.label}, ${p.sold ? 'sold out' : 'available'}`);
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        select(p.n);
-      });
+      b.setAttribute('aria-label', `Plot ${p.label}, ${statusText(p)}`);
+      if (p.reserved) {
+        b.disabled = true;
+        b.title = p.reserved;
+      } else {
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          select(p.n);
+        });
+      }
       pinsEl.appendChild(b);
       pins[p.n] = b;
     });
@@ -894,11 +894,20 @@
         b.textContent = p.n;
         b.classList.toggle('is-sold', p.sold);
         b.classList.toggle('is-selected', selected === p.n);
+        if (p.reserved) {
+          // shown in its place on the grid, but never selectable
+          b.disabled = true;
+          b.classList.add('is-reserved');
+          b.title = p.reserved;
+          b.setAttribute('aria-label', `Plot ${p.label}, ${statusText(p)}`);
+          grid.appendChild(b);
+          continue;
+        }
         const isMatch = matches(p);
         b.disabled = !isMatch;
         b.classList.toggle('is-disabled', !isMatch);
         b.setAttribute('aria-pressed', String(selected === p.n));
-        b.setAttribute('aria-label', `Plot ${p.label}, ${p.sold ? 'sold out' : 'available'}${!isMatch ? ', filtered out' : ''}`);
+        b.setAttribute('aria-label', `Plot ${p.label}, ${statusText(p)}${!isMatch ? ', filtered out' : ''}`);
         b.addEventListener('click', (e) => {
           e.stopPropagation();
           select(p.n);
@@ -909,7 +918,7 @@
       prev.disabled = page === 0;
       next.disabled = start + per >= data.list.length;
       data.list.forEach((p) => {
-        const isMatch = matches(p);
+        const isMatch = matches(p) || !!p.reserved; // reserved tiles always stay visible
         pins[p.n].classList.toggle('is-filtered-out', !isMatch);
         pins[p.n].classList.toggle('is-selected', selected === p.n);
       });
@@ -1052,9 +1061,7 @@
         const targetScreenY = isMobile ? window.innerHeight * 0.20 : window.innerHeight * 0.56;
         const lx = targetScreenX - pinX(p) * W() * s;
         const ly = targetScreenY - pinY(p) * H() * s;
-        const bgScale = 0.6 * s; // 60% of layout scale (parallax depth)
-        const bgX = (lx - roadX()) * 0.25;
-        const bgY = (ly - introY()) * 0.25;
+        // The grass doesn't follow the layout's zoom: it only eases in a little
         return {
           stage: {
             x: lx,
@@ -1062,9 +1069,9 @@
             scale: s,
           },
           bg: {
-            x: bgX,
-            y: bgY,
-            scale: bgScale,
+            x: 0,
+            y: 0,
+            scale: 1.12,
           },
         };
       },
@@ -1131,11 +1138,12 @@
         return;
       }
       const p = data.byNo[n];
-      if (!p) return;
+      if (!p || p.reserved) return; // EV station / not for sale: no details, no enquiry
       if (!card.classList.contains('is-flipped')) explore();
       selected = n;
       page = Math.floor((n - 1) / getPer());
       fill(p);
+      showShape(p);
       renderGrid();
       const wasHidden = pop.hidden;
       pop.hidden = false;
@@ -1151,6 +1159,7 @@
     const closePop = () => {
       pop.hidden = true;
       selected = null;
+      showShape(null);
       dir.textContent = 'Select a plot';
       mplan.classList.remove('is-zoomed');
       if (compass) compass.style.transform = 'rotate(0deg)';
@@ -1173,6 +1182,7 @@
     const reset = (instant) => {
       mode = 'intro';
       selected = null;
+      showShape(null);
       pop.hidden = true;
       closeFilters();
       card.classList.remove('is-flipped');
