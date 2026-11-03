@@ -4985,17 +4985,21 @@ body.is-scrolling .hero__content {
   .about__split-facts-wrap {
     left: 6vw;
     right: 6vw;
-    bottom: 28px;
+    bottom: clamp(48px, 8.5svh, 90px);
   }
 
   .about__split-facts-head {
-    margin-bottom: 6px;
-    font-size: 0.82rem;
+    margin-bottom: 8px;
+    font-size: clamp(0.96rem, 4vw, 1.08rem);
+  }
+
+  .about__split-facts {
+    padding-left: 1.05em;
   }
 
   .about__split-facts li {
-    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
-    line-height: 1.32;
+    font-size: clamp(1.3rem, 5.6vw, 1.74rem);
+    line-height: 1.34;
   }
 }
 
