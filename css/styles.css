@@ -4596,6 +4596,17 @@ body.is-scrolling .hero__content {
 
 @media (max-width: 760px) {
 
+  .conn__header {
+    padding: calc(var(--bar-h) + 0.75rem) var(--gutter) 1.25rem;
+  }
+
+  .conn__header::before {
+    bottom: -18svh;
+    background-position: center 75%;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 62%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.12) 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 62%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.12) 90%, transparent 100%);
+  }
+
   .conn__lead,
   .conn__tagline {
     max-width: none;
