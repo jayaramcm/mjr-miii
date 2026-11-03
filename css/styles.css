@@ -4963,6 +4963,18 @@ body.is-scrolling .hero__content {
   }
 }
 
+.about__blur {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(245, 241, 232, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
 .letter__env {
   z-index: 15;
 }

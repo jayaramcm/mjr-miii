@@ -35,6 +35,7 @@
   const splitFactsHead = section.querySelector('.about__split-facts-head');
   const splitFacts = [...section.querySelectorAll('.about__split-facts li')];
   const video = document.getElementById('aboutVideo');
+  const blurLayer = section.querySelector('.about__blur');
   const optBtns = [...section.querySelectorAll('.about__opt')];
   const env = section.querySelector('.letter__env');
   const flap = section.querySelector('.letter__flap');
@@ -245,6 +246,7 @@
   if (splitFactsHead) gsap.set(splitFactsHead, { opacity: 0, y: 40 });
   if (splitFacts.length) gsap.set(splitFacts, { opacity: 0, y: 36 });
   if (video) gsap.set(video, { opacity: 0 });
+  if (blurLayer) gsap.set(blurLayer, { opacity: 0 });
   gsap.set(env, { y: () => vh() * 0.4 });
   gsap.set(flap, { rotationX: -180 });
   gsap.set(letter, { yPercent: 101 });
@@ -357,12 +359,11 @@
     return 3 * (1 - u) * u * u + u * u * u;
   };
 
-  // The envelope rises in, the flap swings open on its hinge, then the letter
-  // slides up out of the mouth
+  // The envelope rises in over the facts screen as a soft blur settles behind it,
+  // the flap swings open on its hinge, then the letter slides up out of the mouth
   tl.addLabel('envRise')
-    .to([splitQa, splitFactsHead, ...splitFacts], { opacity: 0, y: -28, duration: 0.65, ease: 'power2.inOut' }, 'envRise')
-    .to(video, { opacity: 0, duration: 0.65, ease: 'power2.inOut' }, 'envRise')
     .to(env, { y: 0, duration: 0.9, ease: 'power3.out' }, 'envRise')
+    .to(blurLayer, { opacity: 1, duration: 1.1, ease: 'power2.out' }, 'envRise+=0.15')
     .addLabel('open')
     .to(flap, {
       rotationX: 0, duration: 1.4, ease: joeOut,
