@@ -159,13 +159,29 @@ a {
   color: var(--white);
 }
 
+/* Default hover for gold buttons on light/ivory sections: wipe to brand navy */
 .btn--gold::before {
+  background: var(--navy-900);
+}
+
+.btn--gold:hover,
+.btn--gold:focus-visible {
+  color: var(--ivory);
+}
+
+/* Gold buttons on dark navy surfaces (menu, lead card, un-inked hero nav): wipe to ivory */
+.menu .btn--gold::before,
+.lead .btn--gold::before,
+.nav:not(.is-inked):not(.is-solid) .btn--gold::before {
   background: var(--ivory);
 }
 
-/* white text would vanish on the ivory hover fill */
-.btn--gold:hover,
-.btn--gold:focus-visible {
+.menu .btn--gold:hover,
+.menu .btn--gold:focus-visible,
+.lead .btn--gold:hover,
+.lead .btn--gold:focus-visible,
+.nav:not(.is-inked):not(.is-solid) .btn--gold:hover,
+.nav:not(.is-inked):not(.is-solid) .btn--gold:focus-visible {
   color: var(--navy-900);
 }
 
@@ -176,6 +192,11 @@ a {
 
 .btn--ivory::before {
   background: var(--gold);
+}
+
+.btn--ivory:hover,
+.btn--ivory:focus-visible {
+  color: var(--white);
 }
 
 .btn--line-light {
@@ -199,7 +220,12 @@ a {
 }
 
 .btn--green::before {
-  background: var(--green-700);
+  background: var(--gold);
+}
+
+.btn--green:hover,
+.btn--green:focus-visible {
+  color: var(--white);
 }
 
 /* ---------- Navigation ---------- */
@@ -2024,7 +2050,8 @@ body.is-scrolling .hero__content {
 }
 
 .pcard__filter-apply:hover {
-  background: #1D2856;
+  background: var(--gold);
+  color: var(--white);
   transform: translateY(-1px);
 }
 
@@ -2060,7 +2087,15 @@ body.is-scrolling .hero__content {
   transition: background-color 0.2s, color 0.2s, transform 0.2s var(--ease-out), box-shadow 0.2s;
 }
 
-.pcard__grid button:hover:not(:disabled) {
+.pcard__grid button:hover:not(:disabled):not(.is-sold):not(.is-selected) {
+  background: var(--navy-900);
+  color: #F5F1E8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -6px rgba(29, 40, 86, 0.4);
+}
+
+.pcard__grid button.is-sold:hover:not(:disabled),
+.pcard__grid button.is-selected:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px -6px rgba(29, 40, 86, 0.4);
 }
@@ -2253,9 +2288,10 @@ body.is-scrolling .hero__content {
 }
 
 .pcard__btn-corner--back:hover {
-  background: #1D2856;
+  background: #CA982C;
+  color: #FFFFFF;
   transform: scale(1.06);
-  box-shadow: 0 6px 14px rgba(29, 40, 86, 0.4);
+  box-shadow: 0 6px 14px rgba(202, 152, 44, 0.4);
 }
 
 .pcard__btn-corner--min {
@@ -2264,9 +2300,10 @@ body.is-scrolling .hero__content {
 }
 
 .pcard__btn-corner--min:hover {
-  background: #CA982C !important;
+  background: #1D2856 !important;
+  color: #F5F1E8;
   transform: scale(1.06);
-  box-shadow: 0 6px 14px rgba(202, 152, 44, 0.4);
+  box-shadow: 0 6px 14px rgba(29, 40, 86, 0.4);
 }
 
 .pcard__compass {
@@ -2550,12 +2587,18 @@ body.is-scrolling .hero__content {
 .plotpop__close:focus-visible {
   transform: translateX(-50%) scale(1.08);
   box-shadow: 0 6px 18px rgba(12, 12, 12, 0.35);
-  background: #F5F1E8;
+  background: var(--navy-900);
+  color: #F5F1E8;
+  border-color: var(--navy-900);
   outline: none;
 }
 
 .plotpop__close svg {
   display: block;
+}
+
+.plotpop__close svg path {
+  stroke: currentColor;
 }
 
 .plotpop__close-label {
@@ -5474,11 +5517,17 @@ body.is-scrolling .hero__content {
 .enquire__call {
   background: var(--white);
   color: var(--navy-900);
+  border: 1px solid rgba(29, 40, 86, 0.16);
 }
 
-.enquire__call:hover {
+.enquire__call::before {
   background: var(--navy-900);
+}
+
+.enquire__call:hover,
+.enquire__call:focus-visible {
   color: #F5F1E8;
+  border-color: var(--navy-900);
 }
 
 /* Navy form card */
