@@ -575,8 +575,9 @@
         scale: 0.9,
         transformPerspective: 1200,
       });
-      // The layout (1920 x 1441, turned upright on phones) is fitted so the
-      // entire township and 150 ft main road stay cleanly inside the viewport
+      // The layout (1920 x 1441, turned upright on phones) is scaled so the
+      // 150 ft main road spans 100% edge-to-edge across the screen, while
+      // overflowing the top edge so the bottom road stays in view
       const PLAN_W = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_W : 1920;
       const PLAN_H = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_H : 1441;
       const ROAD_X0 = 0.0182;
@@ -585,14 +586,12 @@
       const LAYOUT_Y0 = 0.0583;
       const LAYOUT_Y1 = 0.9285;
       const LAYOUT_SPAN_Y = LAYOUT_Y1 - LAYOUT_Y0;
-      const isLaptop14 = () => window.innerWidth > 640 && window.innerWidth <= 1600;
       const planH = () => (window.innerWidth <= 640 ? window.innerWidth * PLAN_W / PLAN_H : window.innerWidth * PLAN_H / PLAN_W);
       const roadScale = () => {
         if (window.innerWidth <= 640) {
-          return 0.95 / LAYOUT_SPAN_Y;
+          return Math.max(1 / LAYOUT_SPAN_Y, (window.innerHeight / planH()) / ROAD_SPAN);
         }
-        const fitVert = (window.innerHeight * (isLaptop14() ? 0.90 : 0.92)) / (LAYOUT_SPAN_Y * planH());
-        return Math.min(1 / ROAD_SPAN, fitVert);
+        return 1 / ROAD_SPAN;
       };
       const roadX = () => {
         const s = roadScale();
@@ -600,19 +599,15 @@
           const spanW = LAYOUT_SPAN_Y * window.innerWidth * s;
           return (window.innerWidth - spanW) / 2 - LAYOUT_Y0 * window.innerWidth * s;
         }
-        const leftPad = Math.max(window.innerWidth * 0.025, (window.innerWidth * 0.68 - 0.882 * window.innerWidth * s) * 0.45);
-        return -ROAD_X0 * window.innerWidth * s + leftPad;
+        return -ROAD_X0 * window.innerWidth * s;
       };
       const introY = () => {
         const s = roadScale();
         const scaledH = planH() * s;
         if (window.innerWidth <= 640) {
-          return 62 - (1 - 0.915) * scaledH;
+          return -(1 - ROAD_X1) * scaledH;
         }
-        const topEdge = LAYOUT_Y0 * scaledH;
-        const botEdge = LAYOUT_Y1 * scaledH;
-        const spanH = botEdge - topEdge;
-        return (window.innerHeight - spanH) / 2 - topEdge + window.innerHeight * 0.012;
+        return Math.min(-0.10 * scaledH, window.innerHeight - 0.94 * scaledH);
       };
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 
