@@ -1130,7 +1130,7 @@
       const st = document.getElementById('ppStatus');
       st.textContent = p.sold ? 'Sold Out' : 'Available';
       st.classList.toggle('is-sold', p.sold);
-      document.getElementById('ppSize').textContent = p.size.toFixed(1);
+      document.getElementById('ppSize').textContent = String(p.size);
       document.getElementById('ppFacing').textContent = p.facing;
       document.getElementById('ppDesc').textContent = p.desc;
       document.getElementById('ppHighlights').innerHTML = p.highlights.map((h) => `<li>${h}</li>`).join('');
