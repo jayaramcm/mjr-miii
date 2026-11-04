@@ -607,7 +607,8 @@
         if (window.innerWidth <= 640) {
           return -(1 - ROAD_X1) * scaledH;
         }
-        return Math.max(-0.205 * scaledH, Math.min(-0.10 * scaledH, window.innerHeight - 0.86 * scaledH));
+        // Ensure at least ~60% of the swimming pool (y = 0.113..0.1975 in layout) is visible at the top
+        return Math.max(-0.146 * scaledH, Math.min(-0.10 * scaledH, window.innerHeight - 0.895 * scaledH));
       };
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 
