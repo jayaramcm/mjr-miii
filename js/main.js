@@ -1065,7 +1065,8 @@
         const targetScreenY = isMobile ? window.innerHeight * 0.20 : window.innerHeight * 0.56;
         const lx = targetScreenX - pinX(p) * W() * s;
         const ly = targetScreenY - pinY(p) * H() * s;
-        // The grass doesn't follow the layout's zoom: it only eases in a little
+        // Grass zooms in at 40% of the layout zoom when a plot is selected
+        const bgScale = 1 + (s / roadScale() - 1) * 0.4;
         return {
           stage: {
             x: lx,
@@ -1075,7 +1076,7 @@
           bg: {
             x: 0,
             y: 0,
-            scale: 1.12,
+            scale: bgScale,
           },
         };
       },
