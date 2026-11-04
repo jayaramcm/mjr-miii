@@ -575,49 +575,44 @@
         scale: 0.9,
         transformPerspective: 1200,
       });
-      // The layout (2560 x 1440, turned upright on phones) is scaled so the
-      // 150 ft main road spans edge-to-edge across the screen (~78.2% of image width)
-      const PLAN_W = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_W : 2560;
-      const PLAN_H = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_H : 1440;
-      const ROAD_X0 = 0.1102;
-      const ROAD_X1 = 0.8914;
+      // The layout (1920 x 1441, turned upright on phones) is fitted so the
+      // entire township and 150 ft main road stay cleanly inside the viewport
+      const PLAN_W = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_W : 1920;
+      const PLAN_H = window.MJR_PLOTS ? window.MJR_PLOTS.IMG_H : 1441;
+      const ROAD_X0 = 0.0182;
+      const ROAD_X1 = 0.9818;
       const ROAD_SPAN = ROAD_X1 - ROAD_X0;
+      const LAYOUT_Y0 = 0.0583;
+      const LAYOUT_Y1 = 0.9285;
+      const LAYOUT_SPAN_Y = LAYOUT_Y1 - LAYOUT_Y0;
       const isLaptop14 = () => window.innerWidth > 640 && window.innerWidth <= 1600;
       const planH = () => (window.innerWidth <= 640 ? window.innerWidth * PLAN_W / PLAN_H : window.innerWidth * PLAN_H / PLAN_W);
       const roadScale = () => {
         if (window.innerWidth <= 640) {
-          return Math.max(1 / ROAD_SPAN, (window.innerHeight / planH()) / ROAD_SPAN);
+          return 0.95 / LAYOUT_SPAN_Y;
         }
-        if (isLaptop14()) {
-          return Math.min(1 / ROAD_SPAN, window.innerHeight / (0.955 * planH()));
-        }
-        return 1 / ROAD_SPAN;
+        const fitVert = (window.innerHeight * (isLaptop14() ? 0.90 : 0.92)) / (LAYOUT_SPAN_Y * planH());
+        return Math.min(1 / ROAD_SPAN, fitVert);
       };
       const roadX = () => {
+        const s = roadScale();
         if (window.innerWidth <= 640) {
-          return (window.innerWidth - window.innerWidth * roadScale()) / 2;
+          const spanW = LAYOUT_SPAN_Y * window.innerWidth * s;
+          return (window.innerWidth - spanW) / 2 - LAYOUT_Y0 * window.innerWidth * s;
         }
-        if (isLaptop14()) {
-          const s = roadScale();
-          const leftPad = Math.max(0, (window.innerWidth * 0.68 - ROAD_SPAN * window.innerWidth * s) * 0.35);
-          return -ROAD_X0 * window.innerWidth * s + leftPad;
-        }
-        return -ROAD_X0 * window.innerWidth * roadScale();
+        const leftPad = Math.max(window.innerWidth * 0.025, (window.innerWidth * 0.68 - 0.882 * window.innerWidth * s) * 0.45);
+        return -ROAD_X0 * window.innerWidth * s + leftPad;
       };
       const introY = () => {
+        const s = roadScale();
+        const scaledH = planH() * s;
         if (window.innerWidth <= 640) {
-          return -(1 - ROAD_X1) * planH() * roadScale();
+          return 62 - (1 - 0.915) * scaledH;
         }
-        const scaledH = planH() * roadScale();
-        if (isLaptop14()) {
-          const topPad = 0.040 * scaledH;
-          const botEdge = 0.988 * scaledH;
-          const spanH = botEdge - topPad;
-          return (window.innerHeight - spanH) / 2 - topPad;
-        }
-        const centerY = (window.innerHeight - scaledH) / 2;
-        const maxBottomY = window.innerHeight - 0.992 * scaledH;
-        return Math.max(centerY, maxBottomY);
+        const topEdge = LAYOUT_Y0 * scaledH;
+        const botEdge = LAYOUT_Y1 * scaledH;
+        const spanH = botEdge - topEdge;
+        return (window.innerHeight - spanH) / 2 - topEdge + window.innerHeight * 0.012;
       };
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 
@@ -1070,7 +1065,7 @@
         const isMobile = window.innerWidth <= 640;
         const narrow = window.innerWidth < 760;
         const cardW = card.classList.contains('is-minimized') ? 0 : card.offsetWidth;
-        const s = 3.2;
+        const s = isMobile ? 2.8 : 2.65;
         const targetScreenX = narrow ? window.innerWidth * 0.5 : (window.innerWidth - cardW) * 0.52;
         const targetScreenY = isMobile ? window.innerHeight * 0.20 : window.innerHeight * 0.56;
         const lx = targetScreenX - pinX(p) * W() * s;

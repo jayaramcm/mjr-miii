@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet">
   <link rel="preload" as="video" href="Assets/hero-day-and-night.mp4" type="video/mp4">
-  <link rel="stylesheet" href="css/styles.css?v=144">
+  <link rel="stylesheet" href="css/styles.css?v=145">
 </head>
 <body>
   <!-- Preloader: the MJR mark builds itself. Shown on first load and between
@@ -233,11 +233,13 @@
             <!-- Grass ground: fills the frame and only eases in a little when a plot is selected (js/main.js) -->
             <img class="mplan__img" src="Assets/Lush Grassland Garden Clusters.png" alt="" aria-hidden="true" decoding="async">
             <div class="mplan__stage" id="planStage">
-              <img class="mplan__plan" src="Assets/layout MJR.png" alt="MJR Township master layout: 104 plots in blocks between the internal roads, with the green and water zones, facing the 150 ft main road" decoding="async">
-              <!-- Fill of the selected plot, traced from the layout image (2560 x 1440 frame) -->
-              <svg class="mplan__shape" viewBox="0 0 2560 1440" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <img class="mplan__plan" src="Assets/plots layout.svg?v=1" alt="MJR Township master layout: 104 plots in blocks between the internal roads, with the green and water zones, facing the 150 ft main road" decoding="async">
+              <!-- Fill of the selected plot, traced from plots layout.svg (1920 x 1441 frame) -->
+              <svg class="mplan__shape" viewBox="0 0 1920 1441" preserveAspectRatio="none" aria-hidden="true" focusable="false">
                 <polygon id="planShape" points=""></polygon>
               </svg>
+              <!-- Bushes and roads overlay layer on top of the selected plot fill -->
+              <img class="mplan__roads" src="Assets/Triangular Garden Road Network 2.png?v=1" alt="" aria-hidden="true" decoding="async">
             </div>
             <div class="mplan__pins" id="planPins" aria-label="Plots on the master plan"></div>
 
@@ -1034,8 +1036,8 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
-  <script src="js/plots-data.js?v=11" defer></script>
-  <script src="js/main.js?v=67" defer></script>
+  <script src="js/plots-data.js?v=12" defer></script>
+  <script src="js/main.js?v=68" defer></script>
   <script src="js/amenities.js?v=24" defer></script>
   <script src="js/connectivity.js?v=18" defer></script>
   <script src="js/about.js?v=36" defer></script>
