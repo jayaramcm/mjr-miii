@@ -4432,7 +4432,6 @@ body.is-scrolling .hero__content {
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: #4494E4;
 }
 
 .conn__video {
@@ -4441,6 +4440,7 @@ body.is-scrolling .hero__content {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: #4494E4;
 }
 
 /* Videos and cards share a layer that slides left at the end */
