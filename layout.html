@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plot Layout and Availability | MJR Township, Kalwakurthy</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy: #1D2856; --gold: #CA982C; --ivory: #F5F1E8; --text: #2f2f2f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ivory); color: var(--text); font: 400 15px/1.55 "Jost", system-ui, sans-serif; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; border-bottom: 2px solid var(--navy); padding-bottom: 12px; }
+    h1 { margin: 0; font: 400 clamp(1.4rem, 3vw, 2rem)/1.15 "Marcellus", serif; color: var(--navy); }
+    .meta { margin: 4px 0 0; font-size: 0.9rem; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--navy); background: var(--navy); color: #fff; font: 500 0.85rem/1 "Jost", sans-serif; letter-spacing: 0.04em; text-decoration: none; cursor: pointer; }
+    .btn--line { background: transparent; color: var(--navy); }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 14px 0; padding: 0; list-style: none; font-size: 0.9rem; }
+    .legend i { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; border: 1px solid #555; }
+    .map { background: #fff; border: 1px solid #d8d2c4; }
+    .map svg { display: block; width: 100%; height: auto; }
+    .p { stroke: #fff; stroke-width: 2; }
+    .p--avail { fill: #2F6B3A; }
+    .p--sold { fill: var(--gold); }
+    .p--na { fill: #9a9a9a; }
+    .n { font: 600 15px "Jost", sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 0.88rem; background: #fff; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #e3ddcf; text-align: left; }
+    thead th { background: var(--navy); color: #fff; font-weight: 500; }
+    td.st--sold { color: #8a6417; }
+    td.st--na { color: #666; }
+    .fine { margin-top: 16px; font-size: 0.8rem; color: #555; }
+    @media print {
+      @page { size: A3 landscape; margin: 10mm; }
+      body { background: #fff; }
+      .actions { display: none; }
+      .page { max-width: none; padding: 0; }
+      table { page-break-before: always; font-size: 9pt; }
+      .p--avail, .p--sold, .p--na, thead th, .legend i { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>MJR Township, Kalwakurthy: plot layout and availability</h1>
+        <p class="meta">Tirupati Highway (NH 167K) &middot; 104 plots &middot; 7.93 acres* &middot; TG RERA P01600010465 &middot; Availability as of <strong id="asOf"></strong></p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" onclick="window.print()">Print or save as PDF</button>
+        <a class="btn btn--line" href="index.html#plots">Back to the website</a>
+      </div>
+    </header>
+    <ul class="legend" aria-label="Legend">
+      <li><i style="background:#2F6B3A"></i>Available</li>
+      <li><i style="background:#CA982C"></i>Sold</li>
+      <li><i style="background:#9a9a9a"></i>EV charging station / Not for sale</li>
+    </ul>
+    <div class="map"><svg id="plan" viewBox="0 0 1920 1441" role="img" aria-label="Plot layout with plot numbers and availability"></svg></div>
+    <table>
+      <caption class="fine" style="caption-side: bottom; text-align: left">Sizes are approximate and subject to final survey. Facing is indicative. Confirm availability and prices with the sales team: +91 90100 55596, sales@mjrinfra.com.</caption>
+      <thead><tr><th>Plot</th><th>Size (sq. yd., approx.)</th><th>Facing</th><th>Fronting road</th><th>Status</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="fine">*Area is approximate. Plans are indicative and subject to approval from the competent authorities.</p>
+  </div>
+  <script src="js/plots-data.js?v=15"></script>
+  <script>
+    (() => {
+      const d = window.MJR_PLOTS;
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.getElementById('plan');
+      const bg = document.createElementNS(ns, 'image');
+      bg.setAttribute('href', 'Assets/plots layout.svg');
+      bg.setAttribute('width', '1920');
+      bg.setAttribute('height', '1441');
+      svg.appendChild(bg);
+      const st = (p) => (p.reserved ? 'na' : p.sold ? 'sold' : 'avail');
+      const label = (p) => (p.reserved ? p.reserved : p.sold ? 'Sold' : 'Available');
+      d.list.forEach((p) => {
+        if (p.shape) {
+          const poly = document.createElementNS(ns, 'polygon');
+          poly.setAttribute('points', p.shape);
+          poly.setAttribute('class', 'p p--' + st(p));
+          svg.appendChild(poly);
+        }
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x', p.x);
+        t.setAttribute('y', p.y);
+        t.setAttribute('class', 'n');
+        t.textContent = p.n;
+        svg.appendChild(t);
+      });
+      document.getElementById('rows').innerHTML = d.list.map((p) =>
+        `<tr><td>${p.label}</td><td>${p.size}</td><td>${p.facing}</td><td>${p.road} ft</td><td class="st--${st(p)}">${label(p)}</td></tr>`).join('');
+      const dt = new Date((d.UPDATED || '') + 'T00:00:00');
+      document.getElementById('asOf').textContent = isNaN(dt) ? '—' : dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    })();
+  </script>
+</body>
+</html>

@@ -2,11 +2,12 @@
    1. [data-rise] elements slide up as they enter the viewport, staggered
       within each group.
    2. About stats count up once.
-   3. FAQ: one answer open at a time, with a smooth height animation.
-   4. Enquiry form: validation and an on-screen thank-you.
+   3. FAQ: a standard accordion, one answer open at a time.
+   4. Enquiry form: validation, submission and a clear confirmation.
    5. Closing photo drifts slowly behind the line as it scrolls past. */
 (() => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // 1. Rise-in reveal
   const risers = [...document.querySelectorAll('[data-rise]')];
@@ -58,83 +59,32 @@
     counters.forEach((el) => countIo.observe(el));
   }
 
-  // 3. FAQ strips: clicking a strip flips it between its question (Q tile on
-  //    the left) and its answer (A tile on the right); opening one closes any
-  //    other. The first starts on its answer as a hint that strips can be clicked.
-  const qaItems = [...document.querySelectorAll('.qa')];
+  // 3. FAQ: native <details>; opening one closes the others, and the answer
+  //    eases open under its question
+  const qaItems = [...document.querySelectorAll('.faq .qa')];
   qaItems.forEach((item) => {
-    item.querySelector('.qa__row').addEventListener('click', () => {
-      const opening = !item.classList.contains('is-open');
+    const body = item.querySelector('.qa__a');
+    item.querySelector('summary').addEventListener('click', (e) => {
+      if (reduceMotion || !window.gsap) return;
+      e.preventDefault();
+      const opening = !item.open;
       qaItems.forEach((other) => {
-        const open = other === item && opening;
-        other.classList.toggle('is-open', open);
-        other.querySelector('.qa__row').setAttribute('aria-expanded', String(open));
+        if (other === item || !other.open) return;
+        const ob = other.querySelector('.qa__a');
+        gsap.to(ob, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { other.open = false; gsap.set(ob, { clearProps: 'height' }); } });
       });
-    });
-  });
-
-  // FAQ stack: the section pins with the strips that fit, plus a sliver of the
-  // next as a cue. After a short hold, each scroll plays one whole step: the
-  // strips below slide up so the next lands on the stack, leaving the top 5% of
-  // the one beneath showing, until the last strip is in view. The title shrinks
-  // a little during the first step only.
-  const faq = document.querySelector('.faq');
-  if (faq && window.gsap && window.ScrollTrigger && !reduceMotion) {
-    gsap.registerPlugin(ScrollTrigger);
-    const title = faq.querySelector('.faq__title');
-    const win = faq.querySelector('.faq__window');
-    const strips = [...faq.querySelectorAll('.qa')];
-    const PEEK = 0.045; // share of the screen the next strip shows
-    const EDGE = 0.05;  // share of each stacked strip left showing
-    const lead = () => window.innerHeight * 0.4;  // hold before the first step
-    const stepLen = () => window.innerHeight * 0.35;
-    let pitch = 0, shift = 0, hidden = 0;
-
-    const measure = () => {
-      gsap.set(strips, { y: 0 });
-      gsap.set(title, { scale: 1 });
-      win.style.height = '';
-      pitch = strips.length > 1 ? strips[1].offsetTop - strips[0].offsetTop : 0;
-      shift = pitch - strips[0].offsetHeight * EDGE;
-      const room = window.innerHeight - win.getBoundingClientRect().top + faq.getBoundingClientRect().top;
-      const peek = window.innerHeight * PEEK;
-      const fit = Math.max(1, Math.floor((room - peek) / pitch));
-      const winH = fit * pitch + peek;
-      const need = strips.length * pitch - (pitch - strips[0].offsetHeight) - winH;
-      hidden = need > 0 ? Math.min(strips.length - 1, Math.ceil(need / shift)) : 0;
-      win.style.height = hidden ? winH + 'px' : '';
-    };
-
-    const render = (s) => {
-      strips.forEach((strip, i) => gsap.set(strip, { y: -shift * Math.min(i, s) }));
-      gsap.set(title, { scale: 1 - 0.12 * Math.min(1, s) });
-    };
-
-    // Steps play as whole animations rather than following the scrollbar
-    const state = { s: 0 };
-    let step = 0;
-    const goTo = (target) => {
-      target = Math.max(0, Math.min(hidden, target));
-      if (target === step) return;
-      step = target;
-      gsap.to(state, { s: step, duration: 0.7, ease: 'power3.out', overwrite: true, onUpdate: () => render(state.s) });
-    };
-    const stepAt = (self) => (self.scroll() - self.start - lead()) / stepLen();
-
-    measure();
-    ScrollTrigger.create({
-      trigger: faq,
-      start: 'top top',
-      end: () => '+=' + (lead() + Math.max(1, hidden) * stepLen()),
-      pin: true,
-      invalidateOnRefresh: true,
-      onRefreshInit: () => { measure(); state.s = step = 0; },
-      onRefresh: (self) => { step = Math.max(0, Math.min(hidden, Math.ceil(stepAt(self) - 0.02))); state.s = step; render(step); },
-      onUpdate: (self) => {
-        const f = stepAt(self);
-        goTo(self.direction > 0 ? Math.ceil(f - 0.02) : Math.floor(f + 0.02));
+      if (opening) {
+        item.open = true;
+        gsap.fromTo(body, { height: 0 }, { height: 'auto', duration: 0.45, ease: 'power2.out', clearProps: 'height' });
+      } else {
+        gsap.to(body, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { item.open = false; gsap.set(body, { clearProps: 'height' }); } });
       }
     });
+  });
+  if (reduceMotion || !window.gsap) {
+    qaItems.forEach((d) => d.addEventListener('toggle', () => {
+      if (d.open) qaItems.forEach((o) => { if (o !== d) o.open = false; });
+    }));
   }
 
   // 4. Enquiry form
@@ -142,10 +92,14 @@
   if (form) {
     const name = document.getElementById('ldName');
     const phone = document.getElementById('ldPhone');
+    const submit = document.getElementById('leadSubmit');
+    const msg = document.getElementById('leadMsg');
     phone.addEventListener('input', () => { phone.value = phone.value.replace(/\D/g, '').slice(0, 10); });
+    let sending = false;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (sending) return;
       const checks = [
         [name, document.getElementById('ldNameErr'), name.value.trim().length >= 2],
         [phone, document.getElementById('ldPhoneErr'), /^[6-9]\d{9}$/.test(phone.value)],
@@ -158,18 +112,168 @@
       });
       if (firstBad) { firstBad.focus(); return; }
 
-      const submit = document.getElementById('leadSubmit');
+      const MJR = window.MJR || {};
+      sending = true;
+      msg.hidden = true;
       submit.setAttribute('aria-busy', 'true');
       submit.textContent = 'Sending...';
-      // TODO: connect to the MJR sales CRM / lead endpoint. Until then the request is only acknowledged on screen.
-      // the form stays in place: the button confirms, then resets
-      setTimeout(() => {
+      const ph = phone.value;
+      try {
+        if (!MJR.submitLead) throw new Error('no sender');
+        const res = await MJR.submitLead({
+          form: 'contact',
+          intent: document.getElementById('ldInterest').value,
+          name: name.value.trim(),
+          phone: ph,
+        });
         form.reset();
+        msg.className = 'form-msg form-msg--ok';
+        msg.innerHTML = `<strong>Thank you. Your enquiry has reached our sales team.</strong> They will call you on +91 ${esc(ph)} shortly.${res.ref ? ` Reference: ${esc(res.ref)}.` : ''}`;
+      } catch (err) {
+        msg.className = 'form-msg form-msg--error';
+        msg.textContent = MJR.SEND_FAIL || 'We could not send your enquiry. Please call +91 90100 55596.';
+      } finally {
+        msg.hidden = false;
+        sending = false;
         submit.removeAttribute('aria-busy');
-        submit.textContent = 'Thank you, we will call you';
-        setTimeout(() => { submit.textContent = 'Get in touch'; }, 4000);
-      }, 700);
+        submit.textContent = 'Get in touch';
+      }
     });
+  }
+
+  // 5. Facts the sales team keeps in js/site-data.js and js/plots-data.js
+  const site = window.MJR_SITE || {};
+  const fmtDate = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    return isNaN(d) ? iso : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
+  // Availability date on the master plan
+  const avail = document.getElementById('availDate');
+  const updated = window.MJR_PLOTS && window.MJR_PLOTS.UPDATED;
+  if (avail && updated) { avail.dateTime = updated; avail.textContent = fmtDate(updated); }
+
+  // Amenity tabs: filter the grid; name and status stay on every card
+  const tabs = [...document.querySelectorAll('[data-amen-filter]')];
+  const acards = [...document.querySelectorAll('#amenGrid .agrid__card')];
+  tabs.forEach((tab) => tab.addEventListener('click', () => {
+    const f = tab.dataset.amenFilter;
+    tabs.forEach((t) => { const on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-pressed', String(on)); });
+    const show = acards.filter((c) => f === 'all' || c.dataset.cat === f);
+    acards.forEach((c) => { c.hidden = !show.includes(c); });
+    if (!reduceMotion && window.gsap) gsap.fromTo(show, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out', clearProps: 'transform' });
+    // On a tall (phone) grid the filtered cards sit at its top: bring that into view
+    const first = show[0];
+    const spot = (window.MJR_SPOTS || {}).amenTabs;
+    if (first && spot && window.MJR && window.MJR.scrollToEl && first.getBoundingClientRect().bottom < 120) {
+      window.MJR.scrollToEl(spot());
+    }
+  }));
+
+  // Location: map pin, directions and road distances
+  const map = site.map || {};
+  const hasPin = typeof map.lat === 'number' && typeof map.lng === 'number';
+  const q = encodeURIComponent(hasPin ? `${map.lat},${map.lng}` : (map.address || 'Kalwakurthy, Telangana'));
+  const frame = document.getElementById('locMap');
+  if (frame) frame.src = `https://www.google.com/maps?q=${q}&z=${hasPin ? 16 : 14}&output=embed`;
+  const dirBtn = document.getElementById('locDirections');
+  if (dirBtn) dirBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+  const openBtn = document.getElementById('locOpenMap');
+  if (openBtn) openBtn.href = `https://www.google.com/maps/search/?api=1&query=${q}`;
+  const dist = site.distances || { rows: [] };
+  const distBody = document.getElementById('distBody');
+  if (distBody) {
+    if (!dist.rows || !dist.rows.length) distBody.closest('.loc-info__side').hidden = true;
+    else {
+      distBody.innerHTML = dist.rows.map((r) => {
+        const route = `https://www.google.com/maps/dir/?api=1&origin=${q}&destination=${encodeURIComponent(r.to + ', Telangana')}`;
+        return `<tr><th scope="row">${esc(r.to)}</th><td>${dist.verified ? '' : 'approx. '}${esc(r.km)} km</td>` +
+          `<td><a href="${route}" target="_blank" rel="noopener" aria-label="Route to ${esc(r.to)} on Google Maps">Route</a></td></tr>`;
+      }).join('');
+      const note = document.getElementById('distNote');
+      if (note) note.textContent = dist.verified
+        ? 'Road distances from the project gate, measured on Google Maps. Travel times vary with traffic.'
+        : 'Approximate road distances from the project. Tap Route for the live distance and travel time.';
+    }
+  }
+
+  // Project status, dated site photographs, completed projects
+  const statusList = document.getElementById('statusList');
+  const status = site.status || [];
+  if (statusList) {
+    if (!status.length) statusList.closest('.status-strip').hidden = true;
+    else {
+      const label = { done: 'Complete', progress: 'In progress', next: 'Planned' };
+      statusList.innerHTML = status.map((st) => `<li class="timeline__item is-${esc(st.state || 'next')}">` +
+        `<span class="timeline__dot" aria-hidden="true"></span>` +
+        `<p class="timeline__label">${esc(st.label)}<span class="timeline__state">${esc(st.stateLabel || label[st.state] || '')}</span></p>` +
+        `<p class="timeline__detail">${esc(st.detail || '')}${st.date ? ` &middot; ${esc(fmtDate(st.date))}` : ''}</p></li>`).join('');
+      const asOf = document.getElementById('statusAsOf');
+      if (asOf && site.statusAsOf) asOf.textContent = `Status as of ${fmtDate(site.statusAsOf)}`;
+    }
+  }
+  const photos = site.sitePhotos || [];
+  if (photos.length) {
+    document.getElementById('sitePhotoGrid').innerHTML = photos.map((p) =>
+      `<li><figure><img src="${esc(p.src)}" alt="${esc(p.caption || 'Site photograph')}" loading="lazy" decoding="async">` +
+      `<figcaption><time datetime="${esc(p.date)}">${esc(fmtDate(p.date))}</time>${p.caption ? ` &middot; ${esc(p.caption)}` : ''}</figcaption></figure></li>`).join('');
+    document.getElementById('sitePhotos').hidden = false;
+  }
+  const projects = site.completedProjects || [];
+  if (projects.length) {
+    document.getElementById('completedList').innerHTML = projects.map((p) =>
+      `<li><strong>${esc(p.name)}</strong> <span>${[p.place, p.year, p.units ? `${p.units} plots` : ''].filter(Boolean).map(esc).join(' &middot; ')}</span></li>`).join('');
+    document.getElementById('completedProjects').hidden = false;
+  }
+
+  // Location: the background turns navy as soon as the top of the map block
+  // reaches the top of the view (the bottom of the nav bar), and back to
+  // ivory on the way up. Measured live on every scroll frame, so images or
+  // embeds that change the page height later can never put it out of step.
+  const locInfo = document.querySelector('.loc-info__frame');
+  const locSection = document.getElementById('location');
+  const siteNav = document.getElementById('siteNav');
+  if (locInfo && locSection) {
+    let ticking = false;
+    const checkNavy = () => {
+      ticking = false;
+      const line = siteNav ? siteNav.getBoundingClientRect().bottom : 0;
+      locSection.classList.toggle('is-navy', locInfo.getBoundingClientRect().top <= line);
+    };
+    const queue = () => { if (!ticking) { ticking = true; requestAnimationFrame(checkNavy); } };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    window.addEventListener('load', queue);
+    checkNavy();
+  }
+
+  // About slides up over the end of Location: once the Location block's bottom
+  // reaches the bottom of the screen it holds still (no extra scroll space is
+  // added) while About rises over it, until About's top reaches the top
+  const locBlock = document.querySelector('.loc-info');
+  const aboutSection = document.getElementById('about');
+  if (locBlock && aboutSection && window.gsap && window.ScrollTrigger && !reduceMotion) {
+    ScrollTrigger.create({
+      trigger: locBlock,
+      start: 'bottom bottom',
+      endTrigger: aboutSection,
+      end: 'top top',
+      pin: true,
+      pinSpacing: false,
+      invalidateOnRefresh: true,
+    });
+  }
+
+  // Phone action bar: tucked away over the hero and the pinned plan, where it would cover controls
+  const bar = document.getElementById('mbar');
+  if (bar && 'IntersectionObserver' in window) {
+    const covering = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => (en.isIntersecting ? covering.add(en.target) : covering.delete(en.target)));
+      bar.classList.toggle('is-hidden', covering.size > 0);
+    }, { threshold: 0.01 });
+    ['heroPin', 'overview'].map((id) => document.getElementById(id)).filter(Boolean).forEach((el) => io.observe(el));
   }
 
   // Paper texture fades away once "A place to build your future." comes into view,

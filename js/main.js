@@ -5,80 +5,10 @@
   const video = document.getElementById('heroVideo');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* ---------- Nav theme from what sits under the bar ----------
-     No bar: the text and logo take whichever of navy / ivory contrasts with
-     the layer under the bar's centre. A [data-nav] tag wins; a photo or video
-     is judged by the brightness of the strip behind the bar; otherwise a solid
-     background colour by its lightness. */
-  const probe = document.createElement('canvas');
-  probe.width = 32; probe.height = 4;
-  const probeCtx = probe.getContext('2d', { willReadFrequently: true });
-  const mediaLook = (el) => {
-    const r = el.getBoundingClientRect();
-    const w = el.naturalWidth || el.videoWidth, h = el.naturalHeight || el.videoHeight;
-    if (!w || !h || r.height <= 0) return 'navy';
-    // the part of the media under the bar, assuming it fills its box
-    const top = Math.max(0, -r.top) / r.height;
-    const span = Math.min(1 - top, nav.offsetHeight / r.height);
-    try {
-      probeCtx.drawImage(el, 0, top * h, w, Math.max(1, span * h), 0, 0, 32, 4);
-      const d = probeCtx.getImageData(0, 0, 32, 4).data;
-      let sum = 0;
-      for (let i = 0; i < d.length; i += 4) sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-      return sum / (d.length / 4) / 255 > 0.6 ? 'light' : 'navy';
-    } catch (e) {
-      return 'navy'; // unreadable (e.g. opened from disk): ivory text over photos
-    }
-  };
-  const navLook = (el) => {
-    const tagged = el.closest('[data-nav]');
-    if (tagged && tagged.dataset.nav) return tagged.dataset.nav;
-    if (el.tagName === 'IMG' || el.tagName === 'VIDEO') return mediaLook(el);
-    const cs = getComputedStyle(el);
-    const m = cs.backgroundColor.match(/[\d.]+/g);
-    if (m && (m[3] === undefined || +m[3] > 0.5)) {
-      const lum = (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) / 255;
-      return lum < 0.4 ? 'navy' : 'light';
-    }
-    if (cs.backgroundImage.startsWith('url(')) return 'image';
-    return null;
-  };
-  const visible = (el) => {
-    let o = 1;
-    for (let n = el; n && n !== document.body; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      if (cs.visibility === 'hidden' || cs.display === 'none') return false;
-      o *= +cs.opacity;
-      if (o < 0.5) return false;
-    }
-    return true;
-  };
-  const themeNav = () => {
-    const y = nav.offsetHeight / 2;
-    // layers with pointer-events: none still count, so lift that for the probe
-    document.documentElement.classList.add('nav-probe');
-    const stack = document.elementsFromPoint(window.innerWidth / 2, y);
-    document.documentElement.classList.remove('nav-probe');
-    let look = 'light';
-    for (const el of stack) {
-      if (nav.contains(el) || el.closest('.preloader') || !visible(el)) continue;
-      const l = navLook(el);
-      if (l) { look = l; break; }
-    }
-    nav.classList.toggle('is-inked', look === 'light');
-  };
-  // Scrubbed scenes keep easing for a moment after the scroll stops, so keep
-  // re-checking every 120ms until 1.5s after the last scroll
-  let lastScroll = 0, navLoop = 0;
-  const navPoll = () => {
-    themeNav();
-    navLoop = performance.now() - lastScroll < 1500 ? setTimeout(navPoll, 120) : 0;
-  };
-  const queueNav = () => { lastScroll = performance.now(); if (!navLoop) navLoop = setTimeout(navPoll, 60); };
-  window.addEventListener('scroll', queueNav, { passive: true });
-  window.addEventListener('resize', queueNav);
-  window.addEventListener('load', themeNav);
-  themeNav();
+  // Data saver or a 2G-class link: keep the page light
+  const conn = navigator.connection || {};
+  const slowNet = !!(conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''));
+  window.MJR = window.MJR || {};
 
   /* ---------- Smooth scroll (Lenis on GSAP's ticker) ----------
      One clock for scroll and animation: Lenis advances on gsap.ticker and
@@ -112,11 +42,13 @@
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a || a.closest('.menu__nav') || a.classList.contains('skip-link')) return;
-    const el = document.querySelector(a.getAttribute('href'));
-    if (!el) return;
+    const spot = a.dataset.spot && (menuSpots[a.dataset.spot] || (window.MJR_SPOTS || {})[a.dataset.spot]);
+    const el = spot ? spot() : document.querySelector(a.getAttribute('href'));
+    if (el == null) return;
     e.preventDefault();
     scrollToEl(el);
   });
+  window.MJR.scrollToEl = scrollToEl;
 
   /* ---------- Intro ---------- */
   let started = false;
@@ -131,7 +63,7 @@
      and every jump from the menu: it fades in, the page jumps underneath while
      it is covered, the scrubbed timelines catch up, then it fades out. */
   const loader = document.getElementById('preloader');
-  const LOADER_MIN = 1800;
+  const LOADER_MIN = 1000;
   const LOADER_FADE = 700;
   const SETTLE = 1200; // scrub: 1 needs about a second to catch up after a jump
   const hideLoader = () => {
@@ -166,7 +98,7 @@
   };
   if (document.readyState === 'complete') firstReveal();
   else window.addEventListener('load', firstReveal, { once: true });
-  setTimeout(firstReveal, 8000); // never hold the page hostage to a slow asset
+  setTimeout(firstReveal, 3500); // never hold the page hostage to a slow asset
 
   /* ---------- Ink bleed (Cartier-style scroll transition) ----------
      Ivory blots open from staggered seeds, grow and merge until the frame
@@ -273,8 +205,23 @@
     if (video.paused) { video.play().catch(() => {}); setPaused(false); }
     else { video.pause(); setPaused(true); }
   });
-  if (reduceMotion.matches) { video.removeAttribute('autoplay'); video.pause(); setPaused(true); }
-  else video.play().catch(() => setPaused(true));
+  let userPaused = false;
+  toggle.addEventListener('click', () => { userPaused = video.paused; });
+  if (reduceMotion.matches || slowNet) {
+    video.removeAttribute('autoplay');
+    video.preload = 'none';
+    video.pause();
+    setPaused(true);
+  } else {
+    video.play().catch(() => setPaused(true));
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => {
+        if (userPaused) return;
+        if (en.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      }).observe(video);
+    }
+  }
 
 /* ---------- Dialog helpers (animated open/close) ---------- */
   const openDialog = (dlg) => {
@@ -334,22 +281,63 @@
     visit: {
       title: 'Schedule a site visit',
       intro: 'Walk the layout, see the roads and pick out plots in person. Our sales team will call to confirm a time.',
-      submit: 'Request a call back',
-      done: 'Our sales team will call you shortly to confirm your site visit.',
+      submit: 'Request a site visit',
+      done: (ph) => `Your request has reached our sales team. They will call you on +91 ${ph} to confirm a time for your visit.`,
       date: true,
+    },
+    price: {
+      title: 'Request the current price sheet',
+      intro: 'Share your number and our sales team will send you the latest price sheet, payment terms and plot availability.',
+      submit: 'Send me the price sheet',
+      done: (ph) => `Your request has reached our sales team. They will contact you on +91 ${ph} with the current price sheet.`,
+      date: false,
+    },
+    docs: {
+      title: 'Request project documents',
+      intro: 'Our team will share copies of the approvals and title documents, and walk you through them before you decide.',
+      submit: 'Request documents',
+      done: (ph) => `Your request has reached our sales team. They will contact you on +91 ${ph} to share the documents.`,
+      date: false,
     },
     brochure: {
       title: 'Download the brochure',
       intro: 'Share your number and we will send the MJR Township brochure along with the latest plot availability.',
       submit: 'Send me the brochure',
-      done: 'The brochure is on its way. Our team may call to answer any questions.',
+      done: (ph) => `Your request has reached our sales team. They will send the brochure to +91 ${ph}.`,
       date: false,
     },
   };
+  /* Lead submission. server.js stores each enquiry and forwards it to the
+     sales team (ENQUIRY_WEBHOOK_URL). Hosted elsewhere? Set
+     window.MJR_ENQUIRY_ENDPOINT before this file loads. */
+  const ENDPOINT = window.MJR_ENQUIRY_ENDPOINT || '/api/enquiry';
+  const submitLead = async (data) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, page: location.href.split('#')[0], sentAt: new Date().toISOString() }),
+        signal: ctrl.signal,
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) throw new Error(json.error || `HTTP ${res.status}`);
+      return json;
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+  const SEND_FAIL = 'We could not send your request just now. Please try again, or call us on +91 90100 55596.';
+  Object.assign(window.MJR, { submitLead, SEND_FAIL });
+  let mode = 'visit';
+  let plotNo = '';
   let lastTrigger = null;
 
-  const openBooking = (mode, trigger, plot) => {
-    const c = copy[mode] || copy.visit;
+  const openBooking = (m, trigger, plot) => {
+    mode = copy[m] ? m : 'visit';
+    plotNo = plot || '';
+    const c = copy[mode];
     lastTrigger = trigger;
     document.getElementById('bookingIntent').value = plot ? 'plot' : mode;
     document.getElementById('bookingPlot').value = plot || '';
@@ -357,9 +345,9 @@
     document.getElementById('bookingIntro').textContent = plot
       ? `Share your number and our sales team will call with pricing, availability and a site visit for Plot ${plot}.`
       : c.intro;
-    form.querySelector('.booking__submit-label').textContent = c.submit;
+    form.querySelector('.booking__submit-label').textContent = plot ? 'Request a call back' : c.submit;
+    document.getElementById('bookingErr').hidden = true;
     document.getElementById('bkDateField').hidden = !c.date;
-    document.getElementById('bookingDoneText').textContent = plot ? `Our sales team will call you shortly about Plot ${plot}.` : c.done;
     document.getElementById('bkDate').min = new Date().toISOString().slice(0, 10);
     formView.hidden = false;
     doneView.hidden = true;
@@ -369,12 +357,13 @@
     openDialog(booking);
   };
 
-  document.querySelectorAll('[data-open-booking]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const mode = btn.dataset.openBooking;
-      if (menu.open) closeDialog(menu, () => openBooking(mode, menuOpenBtn));
-      else openBooking(mode, btn);
-    });
+  window.MJR.openBooking = openBooking;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-open-booking]');
+    if (!btn) return;
+    const m = btn.dataset.openBooking;
+    if (menu.open) closeDialog(menu, () => openBooking(m, menuOpenBtn));
+    else openBooking(m, btn);
   });
   booking.querySelectorAll('[data-close-booking]').forEach((btn) =>
     btn.addEventListener('click', () => closeDialog(booking, () => lastTrigger && lastTrigger.focus()))
@@ -400,19 +389,42 @@
     return !firstBad;
   };
 
-  form.addEventListener('submit', (e) => {
+  let sending = false;
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (sending || !validate()) return;
+    sending = true;
+    const err = document.getElementById('bookingErr');
+    err.hidden = true;
     const submit = document.getElementById('bookingSubmit');
+    const label = submit.querySelector('.booking__submit-label');
+    const was = label.textContent;
     submit.setAttribute('aria-busy', 'true');
-    submit.querySelector('.booking__submit-label').textContent = 'Sending...';
-    // TODO: connect to the MJR sales CRM / lead endpoint. Until then the request is only acknowledged on screen.
-    setTimeout(() => {
-      submit.removeAttribute('aria-busy');
+    label.textContent = 'Sending...';
+    try {
+      const res = await submitLead({
+        form: 'dialog',
+        intent: plotNo ? 'plot' : mode,
+        plot: plotNo,
+        name: document.getElementById('bkName').value.trim(),
+        phone: phone.value,
+        date: document.getElementById('bkDate').value,
+      });
+      document.getElementById('bookingDoneText').textContent = plotNo
+        ? `Your request has reached our sales team. They will call you on +91 ${phone.value} about Plot ${plotNo}.`
+        : copy[mode].done(phone.value);
+      document.getElementById('bookingRef').textContent = res.ref ? `Reference: ${res.ref}` : '';
       formView.hidden = true;
       doneView.hidden = false;
       doneView.focus();
-    }, 700);
+    } catch (ex) {
+      err.textContent = SEND_FAIL;
+      err.hidden = false;
+    } finally {
+      sending = false;
+      submit.removeAttribute('aria-busy');
+      label.textContent = was;
+    }
   });
 
   /* ---------- Hero & Intro sequence (unified timeline on #heroPin) ----------
@@ -526,46 +538,15 @@
       const mplanLabel = why.querySelector('.mplan__label');
       const STRIP = 0.91; // strip left edge as a fraction of the viewport
 
-      // Conveyor positions
-      const OFF_RIGHT = { x: () => window.innerWidth, y: 0, rotation: 14, scale: 1, opacity: 1, filter: 'blur(0px)' };
-      const CENTER = { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, filter: 'blur(0px)' };
-      const LEFT = {
-        x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * 0.37,
-        y: () => window.innerWidth <= 640 ? -window.innerHeight * 0.39 : 0,
-        rotation: 0,
-        scale: 0.74,
-        opacity: 0.8,
-        filter: 'blur(3px)',
-      };
-      const OFF_LEFT = {
-        x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * 0.9,
-        y: () => window.innerWidth <= 640 ? -window.innerHeight * 0.72 : 0,
-        rotation: () => window.innerWidth <= 640 ? 0 : -6,
-        scale: () => window.innerWidth <= 640 ? 0.56 : 0.6,
-        opacity: () => window.innerWidth <= 640 ? 0.65 : 0,
-        filter: 'blur(6px)',
-      };
-      const move = { duration: 1, ease: 'power2.inOut' };
-      // Next pillar waiting at the right edge: the first pillar's entry pose (14deg tilt),
-      // paused with just the capital's corner showing
-      const PEEK_TILT = 14;
-      const PEEK = {
-        x: () => {
-          const vw = window.innerWidth;
-          const w = pillars[0].querySelector('.pillar__img').offsetWidth / 2.2316;
-          // capital height above the base pivot; the tilt swings it right by sin(a) * h
-          const h = vw <= 640 ? window.innerHeight * 0.43 : Math.max(vw * 0.3396, window.innerHeight * 0.6037);
-          const swing = Math.sin(PEEK_TILT * Math.PI / 180) * h;
-          return vw / 2 + w / 2 - swing - vw * 0.04;
-        },
-        y: 0,
-        rotation: PEEK_TILT, scale: 1, opacity: 1, filter: 'blur(0px)',
-      };
-
+      const isPh = () => window.innerWidth <= 640;
+      // How far the "Value pillars" heading travels to sit under the nav bar
+      const titleLift = () => -(pillarsTitle.offsetTop - (isPh() ? 78 : 92));
       gsap.set(introCopy, { opacity: 0, y: 40 });
       gsap.set(pillarsTitle, { opacity: 0, scale: 0.92 });
-      gsap.set(pillars, OFF_RIGHT);
+      gsap.set(pillars, { y: () => window.innerHeight, opacity: 1 });
       gsap.set(copies, { opacity: 0, y: 24 });
+      const planBar = document.getElementById('planBar');
+      if (planBar) gsap.set(planBar, { opacity: 0, y: 24 });
       gsap.set(card, {
         xPercent: () => window.innerWidth <= 640 ? -50 : 0,
         yPercent: () => window.innerWidth <= 640 ? 0 : -50,
@@ -627,12 +608,14 @@
         scrollTrigger: {
           trigger: why,
           start: 'top top',
-          end: () => '+=' + window.innerHeight * 12.5,
+          end: () => '+=' + window.innerHeight * 7,
           pin: true,
           scrub: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const isScrollingBack = self.direction === -1;
+            // progress at which the card has settled on the plan
+            const settled = whyTl.labels.plan / whyTl.duration();
 
             if (isScrollingBack) {
               // 1. If a plot is currently selected & zoomed, close popup & zoom back to overview
@@ -640,11 +623,11 @@
                 explorer.closePop();
               }
               // 2. If the card is minimized, expand it back to full card
-              if (explorer.isMinimized && explorer.isMinimized() && self.progress < 0.85) {
+              if (explorer.isMinimized && explorer.isMinimized() && self.progress < settled) {
                 explorer.expand();
               }
               // 3. If the card is flipped, flip back to front overview
-              if (explorer.isFlipped && explorer.isFlipped() && self.progress < 0.80) {
+              if (explorer.isFlipped && explorer.isFlipped() && self.progress < settled - 0.01) {
                 explorer.reset(false);
               }
             }
@@ -653,7 +636,7 @@
             if (self.progress >= whyTl.labels.plan / whyTl.duration()) explorer.tease && explorer.tease();
 
             // Scrolling back before the card settled closes the explorer cleanly
-            if (self.progress < 0.74) {
+            if (self.progress < settled - 0.04) {
               explorer.reset(true);
             }
           },
@@ -674,34 +657,17 @@
           ease: 'power1.inOut',
         }, 'pan+=0.2')
 
-        // Big "Value pillars"
+        // "Value pillars" appears, then lifts to the top as the colonnade rises
         .to(pillarsTitle, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, window.innerWidth <= 640 ? 'pan+=1.35' : 'pan+=1.2')
-        .to({}, { duration: 0.3 })
+        .to({}, { duration: 0.2 })
+        .addLabel('cols')
+        .to(pillarsTitle, { y: titleLift, scale: () => (isPh() ? 0.62 : 0.5), duration: 1, ease: 'power2.inOut' }, 'cols')
+        .to(pillars, { y: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out' }, 'cols+=0.1')
+        .to(tower, { x: () => -(tower.offsetLeft + tower.offsetWidth - window.innerWidth) - 40, duration: 1, ease: 'power2.inOut' }, 'cols')
+        .to(copies, { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 'cols+=0.7')
+        .to({}, { duration: 0.5 })
 
-        // Pillar 1 swings in over the heading; heading fades
-        .to(pillars[0], { ...CENTER, ...move }, 'p1')
-        .to(pillars[1], { ...PEEK, ...move }, 'p1+=0.2')
-        // Tower spills into panel 2; push its right edge past the left of the viewport
-        .to(tower, { x: () => -(tower.offsetLeft + tower.offsetWidth - window.innerWidth) - 40, ...move }, 'p1')
-        .to(pillarsTitle, { scale: 0.85, duration: 0.8, ease: 'power2.inOut' }, 'p1')
-        .to(pillarsTitle, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 'p1+=0.6')
-        .to(copies[0], { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
-        .to({}, { duration: 0.3 })
-
-        // Pillar 2 pushes pillar 1 left
-        .to(pillars[0], { ...LEFT, ...move }, 'p2')
-        .to(pillars[1], { ...CENTER, ...move }, 'p2')
-        .to(pillars[2], { ...PEEK, ...move }, 'p2+=0.2')
-        .to(copies[1], { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
-        .to({}, { duration: 0.3 })
-
-        // Pillar 3 in, pillar 2 left, pillar 1 out
-        .to(pillars[0], { ...OFF_LEFT, ...move }, 'p3')
-        .to(pillars[1], { ...LEFT, ...move }, 'p3')
-        .to(pillars[2], { ...CENTER, ...move }, 'p3')
-        .to(copies[2], { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
-        .to({}, { duration: 0.3 })
-        // Master plan strip only after Belong has been read
+        // Master plan strip
         .fromTo(mplan, {
           clipPath: () => window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
         }, {
@@ -710,50 +676,50 @@
           ease: 'power2.out',
         }, 'ms')
         .fromTo(mplanLabel, { opacity: 0, x: 40, y: 0 }, { opacity: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.out' }, 'ms+=0.2')
-        .to({}, { duration: 0.4 })
+        .to({}, { duration: 0.3 })
 
-        // Pulled open: the strip's edge sweeps left (or up on mobile) to fill the screen
-        // as the plan slides in with it
-        .to(mplan, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'power2.inOut' }, 'mp')
-        .to(stage, { x: roadX, y: introY, scale: roadScale, duration: 1.8, ease: 'power2.inOut' }, 'mp')
+        // Pulled open: the strip's edge sweeps across as the plan slides in with it;
+        // the colonnade drifts off to the left
+        .to(mplan, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'power2.inOut' }, 'mp')
+        .to(stage, { x: roadX, y: introY, scale: roadScale, duration: 1.6, ease: 'power2.inOut' }, 'mp')
         .to(mplanLabel, {
           x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * STRIP,
           y: () => window.innerWidth <= 640 ? -window.innerHeight * STRIP : 0,
-          duration: 1.8,
-          ease: 'power2.inOut',
-        }, 'mp')
-        .to(mplanLabel, { opacity: 0, duration: 0.5, ease: 'power1.in' }, 'mp+=0.5')
-        .to(pillars[1], {
-          x: () => window.innerWidth <= 640 ? LEFT.x() : OFF_LEFT.x(),
-          y: () => window.innerWidth <= 640 ? LEFT.y() : OFF_LEFT.y(),
-          rotation: () => window.innerWidth <= 640 ? LEFT.rotation : OFF_LEFT.rotation(),
-          scale: () => window.innerWidth <= 640 ? LEFT.scale : OFF_LEFT.scale(),
-          opacity: () => window.innerWidth <= 640 ? LEFT.opacity : OFF_LEFT.opacity(),
-          filter: () => window.innerWidth <= 640 ? LEFT.filter : OFF_LEFT.filter,
           duration: 1.6,
           ease: 'power2.inOut',
         }, 'mp')
-        .to(pillars[2], {
-          x: () => window.innerWidth <= 640 ? CENTER.x : OFF_LEFT.x(),
-          y: () => window.innerWidth <= 640 ? CENTER.y : OFF_LEFT.y(),
-          rotation: () => window.innerWidth <= 640 ? CENTER.rotation : OFF_LEFT.rotation(),
-          scale: () => window.innerWidth <= 640 ? CENTER.scale : OFF_LEFT.scale(),
-          opacity: () => window.innerWidth <= 640 ? CENTER.opacity : OFF_LEFT.opacity(),
-          filter: () => window.innerWidth <= 640 ? CENTER.filter : OFF_LEFT.filter,
-          duration: 1.8,
+        .to(mplanLabel, { opacity: 0, duration: 0.5, ease: 'power1.in' }, 'mp+=0.5')
+        .to([pillars, pillarsTitle], {
+          x: () => (isPh() ? 0 : -window.innerWidth * 0.6),
+          y: () => (isPh() ? -window.innerHeight * 0.5 : 0),
+          opacity: 0,
+          filter: 'blur(6px)',
+          duration: 1.4,
           ease: 'power2.inOut',
         }, 'mp')
-        .to({}, { duration: 0.5 })
+        .to({}, { duration: 0.3 })
 
-        // Plot card slides up from below with a tilt and settles at the vertical centre
+        // Plot card slides up from below with a tilt and settles; the availability bar follows
         .to(card, {
           y: 0, rotationX: 0, rotationZ: 0, scale: 1,
           duration: 1.2, ease: 'power2.out',
         }, 'cl')
+        .to(planBar, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 'cl+=0.6')
         .addLabel('plan')
         .call(() => explorer.tease && explorer.tease())
-        // Hold so the visitor can explore before the section unpins
-        .to({}, { duration: 4.5 });
+        // Hold so the visitor can explore before the amenities rise over the plan
+        .to({}, { duration: 6 });
+
+      // Availability bar: open the plot grid with its filters
+      const planFilterBtn = document.getElementById('planFilterBtn');
+      if (planFilterBtn) {
+        planFilterBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          explorer.expand();
+          explorer.explore(false);
+          setTimeout(() => explorer.openFilters(true), 650);
+        });
+      }
 
       menuSpots.plan = () => whyTl.scrollTrigger.labelToScroll('plan');
     }
@@ -962,11 +928,12 @@
     });
 
     /* Filters toggle & controls */
-    const openFilters = () => {
+    const openFilters = (focusFirst) => {
       filterPanel.hidden = false;
       filterBtn.textContent = 'Close';
       filterBtn.setAttribute('aria-expanded', 'true');
       updateFilterCount();
+      if (focusFirst) filterPanel.querySelector('.pcard__filter-tab.is-active')?.focus({ preventScroll: true });
     };
     const closeFilters = () => {
       filterPanel.hidden = true;
@@ -1175,7 +1142,8 @@
     };
     document.getElementById('ppClose').addEventListener('click', closePop);
 
-    const explore = () => {
+    const explore = (focus = true) => {
+      const wasFlipped = card.classList.contains('is-flipped');
       document.getElementById('exploreBtn').classList.remove('is-glowing');
       card.classList.add('is-flipped');
       mplan.classList.add('is-exploring');
@@ -1183,7 +1151,7 @@
       renderGrid();
       // Keep layout map at exact same size and position when card is flipped!
       // Only scale and move when a plot is selected.
-      setTimeout(() => grid.querySelector('button')?.focus({ preventScroll: true }), 900);
+      if (focus && !wasFlipped) setTimeout(() => grid.querySelector('button:not(:disabled)')?.focus({ preventScroll: true }), 900);
     };
     const reset = (instant) => {
       mode = 'intro';
@@ -1298,7 +1266,7 @@
       document.getElementById('exploreBtn').focus({ preventScroll: true });
     });
     mplan.addEventListener('click', (e) => {
-      if (e.target.closest('.pin') || e.target.closest('.pcard') || e.target.closest('.plotpop') || e.target.closest('.mplan__label')) {
+      if (e.target.closest('.pin') || e.target.closest('.pcard') || e.target.closest('.plotpop') || e.target.closest('.mplan__label') || e.target.closest('.mplan__bar')) {
         return;
       }
       if (selected !== null) {
@@ -1374,6 +1342,8 @@
     renderGrid();
     return {
       tease,
+      explore,
+      openFilters,
       reset,
       closePop,
       expand,

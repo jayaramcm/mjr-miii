@@ -198,5 +198,7 @@
   });
 
   const list = Object.values(plots).sort((a, b) => a.n - b.n);
-  window.MJR_PLOTS = { list, byNo: plots, IMG_W, IMG_H };
+  // Date the SOLD list above was last checked against the sales register
+  const UPDATED = '2026-11-04';
+  window.MJR_PLOTS = { list, byNo: plots, IMG_W, IMG_H, UPDATED };
 })();

@@ -17,6 +17,7 @@
   if (!window.gsap || !window.ScrollTrigger || reduceMotion.matches) {
     // Static fallback: first video's last frame with its card
     const v = videos[0];
+    v.preload = 'auto';
     const end = () => { if (v.duration) v.currentTime = v.duration; };
     v.addEventListener('loadedmetadata', end, { once: true });
     end();
@@ -24,6 +25,14 @@
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
+
+  // Videos download only as the section approaches (they start with preload=none)
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top bottom+=150%',
+    once: true,
+    onEnter: () => videos.forEach((v) => { v.preload = 'auto'; v.load(); }),
+  });
 
   // 1. Header reveal
   const reveal = { trigger: section.querySelector('.conn__header'), start: 'top 75%', toggleActions: 'play none none reverse' };
@@ -33,7 +42,7 @@
     .from(section.querySelector('.conn__tagline'), { y: 30, opacity: 0, duration: 0.9, ease: 'power2.out' }, '-=0.6');
 
   // 2. Scroll-scrubbed videos: slow at both ends, fast through the middle
-  const SCREENS = 1.4; // scroll length of one chapter, in screens
+  const SCREENS = window.innerWidth <= 760 ? 0.7 : 0.85; // scroll length of one chapter, in screens
   const PLAY = 0.75; // share of a chapter spent on the video; the rest brings in the card
   const ease = gsap.parseEase('power3.inOut');
 
@@ -62,12 +71,12 @@
   const folder = section.querySelector('.conn__folder');
   const reraCopy = section.querySelector('.conn__rera-copy');
   // Outro timing, in screens of scroll after the last chapter
-  const HOLD = 0.6; // last frame and its card stay put
-  const SLIDE = 1; // scene slides left as the panel slides in
-  const ROLL = 0.9; // folder rolls in, starting just before the slide ends
+  const HOLD = 0.35; // last frame and its card stay put
+  const SLIDE = 0.7; // scene slides left as the panel slides in
+  const ROLL = 0.6; // folder rolls in, starting just before the slide ends
   const ROLL_AT = HOLD + SLIDE - 0.2;
-  const EXIT_AT = ROLL_AT + ROLL + 0.3; // short hold on the finished panel first
-  const EXIT = 0.75; // strip and text slide out left, the folder out right, leaving cream
+  const EXIT_AT = ROLL_AT + ROLL + 0.45; // short hold on the finished panel first
+  const EXIT = 0.5; // strip and text slide out left, the folder out right, leaving cream
   const OUTRO = EXIT_AT + EXIT;
   const slideEase = gsap.parseEase('power2.inOut');
   const rollEase = gsap.parseEase('power3.out');

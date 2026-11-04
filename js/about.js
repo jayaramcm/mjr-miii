@@ -69,6 +69,16 @@
   }
   gsap.registerPlugin(ScrollTrigger);
 
+  // The construction video downloads only as the section approaches
+  if (video) {
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top bottom+=150%',
+      once: true,
+      onEnter: () => { video.preload = 'auto'; video.load(); },
+    });
+  }
+
   // ---- Non-blocking video scrubber for Option B ----
   let videoReady = false;
   let videoSeeking = false;
@@ -236,7 +246,8 @@
     gsap.set(c, { ...slot(i), rotation: 0 });
   });
   gsap.set(head, { xPercent: -50, yPercent: -50 });
-  gsap.set(title, { opacity: 0, scale: 0.8, filter: 'blur(14px)' });
+  // The title is already in place as About slides up over Location (js/sections.js)
+  gsap.set(title, { opacity: 1, scale: 1, filter: 'blur(0px)' });
   gsap.set(sketch, { xPercent: -50, yPercent: -50, y: () => vh() * 0.525 + sketch.offsetHeight / 2 + 40, rotation: 0 });
   gsap.set(sketches[0], { opacity: 1 });
   gsap.set(linesBox, { xPercent: -50, y: 0 });
@@ -275,14 +286,14 @@
     // Title fades in at the centre
     .to(title, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' })
     .addLabel('titled', '-=0.15')
-    .to({}, { duration: 0.3 })
+    .to({}, { duration: 0.15 })
 
     // Title to the top; first sketch slides up into the centre; paper fades in
     .addLabel('sketch')
     .to(head, { y: titleTopY, duration: 1.2 }, 'sketch')
     .to(sketch, { y: () => sketchRestY, duration: 1.2, ease: 'power3.out' }, 'sketch+=0.55')
     .to(paper, { opacity: 0.7, duration: 1.2, ease: 'none' }, 'sketch')
-    .to({}, { duration: 0.25 })
+    .to({}, { duration: 0.1 })
 
     // First line; sketch 1 turns into sketch 2
     .addLabel('l1')
@@ -290,7 +301,7 @@
     .to(sketch, { rotation: -6, duration: 0.9 }, 'l1')
     .to(sketches[0], { opacity: 0, duration: 0.9 }, 'l1')
     .to(sketches[1], { opacity: 1, duration: 0.9 }, 'l1')
-    .to({}, { duration: 0.25 })
+    .to({}, { duration: 0.1 })
 
     // Bolder second line; sketch 2 turns into sketch 3
     .addLabel('l2')
@@ -298,7 +309,7 @@
     .to(sketch, { rotation: -12, duration: 0.9 }, 'l2')
     .to(sketches[1], { opacity: 0, duration: 0.9 }, 'l2')
     .to(sketches[2], { opacity: 1, duration: 0.9 }, 'l2')
-    .to({}, { duration: 0.4 })
+    .to({}, { duration: 0.2 })
 
     // Title, sketch and lines slide upward smoothly as the stage transitions;
     // Ink bleeds open (Option A) OR video/3D fades in and Q&A slides up (Options B & C)
@@ -316,7 +327,7 @@
     // The stack rises from below and lands in the centre (Option A)
     .to(deck, { y: 0, duration: 1.2, ease: 'power3.out' }, 'ink+=1.6')
     .addLabel('landed')
-    .to({}, { duration: 0.5 });
+    .to({}, { duration: 0.2 });
 
   // Each card in turn lifts off the top with a slight tilt (Option A);
   // Meanwhile in Options B & C, each of the 4 bullet facts appears one after another
@@ -334,7 +345,7 @@
     if (k < splitFacts.length) {
       tl.to(splitFacts[k], { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' }, `${at}+=0.1`);
     }
-    if (k < N - 1) tl.to({}, { duration: 0.6 });
+    if (k < N - 1) tl.to({}, { duration: 0.1 });
   });
 
   // Scrub the construction video (Option B) and Three.js house (Option C)
@@ -370,12 +381,13 @@
       onUpdate: () => { flap.style.zIndex = gsap.getProperty(flap, 'rotationX') < -90 ? 3 : 0; }
     }, 'open')
     .to(letter, { yPercent: 1, duration: 1.4, ease: joeOut }, 'open+=0.25')
-    .to({}, { duration: 0.8 })
+    .to({}, { duration: 0.6 })
     // The letter lifts off the top of the screen at a -10 degree tilt as the envelope drops away
     .addLabel('leave')
     .to(letter, { yPercent: -340, rotation: -10, duration: 1.4, ease: 'power2.in' }, 'leave')
     .to(env, { y: () => vh() * 0.5, duration: 1.4, ease: 'power2.in' }, 'leave+=0.2')
-    .to({}, { duration: 0.6 });
+    // the FAQ slides up over this last stretch (one screen), as the letter leaves
+    .to({}, { duration: 2.4 });
 
   // ---- Option A / B / C Switcher ----
   const setOption = (opt, scrollIfOutside = false) => {
