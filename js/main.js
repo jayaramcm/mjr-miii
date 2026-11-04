@@ -607,7 +607,7 @@
         if (window.innerWidth <= 640) {
           return -(1 - ROAD_X1) * scaledH;
         }
-        return Math.min(-0.10 * scaledH, window.innerHeight - 0.94 * scaledH);
+        return Math.max(-0.205 * scaledH, Math.min(-0.10 * scaledH, window.innerHeight - 0.86 * scaledH));
       };
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 

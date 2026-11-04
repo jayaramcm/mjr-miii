@@ -108,6 +108,7 @@
 <rect width="52.1903" height="149.545" transform="matrix(1 0 0 -1 917.344 1128.11)" fill="#0A1A46" stroke="white" stroke-width="1.00366"/>
 <rect width="51.1866" height="149.545" transform="matrix(1 0 0 -1 969.535 1128.11)" fill="#0A1A46" stroke="white" stroke-width="1.00366"/>
 <path d="M157.072 101.435L123.449 288.116L542.979 279.082C414.444 217.333 157.715 98.1642 157.072 101.435Z" fill="url(#pattern0_429_148)"/>
+<path d="M285 162.8L542.979 279.082L285 284.6V162.8Z" fill="#54C1F0"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M80.293 750.736H581.119V1038.79L80.293 750.736Z" fill="url(#pattern1_429_148)"/>
 <defs>
 <pattern id="pattern0_429_148" patternContentUnits="objectBoundingBox" width="1" height="1">
