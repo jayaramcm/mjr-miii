@@ -2159,9 +2159,9 @@ body.is-scrolling .hero__content {
 /* Pager patch (505,698 140x36) - mathematically aligned */
 .pcard__pager {
   position: absolute;
-  left: 65%;
+  left: 71.5%;
   top: 77.2%;
-  width: 27%;
+  width: 20.5%;
   height: 4.2%;
   display: inline-flex;
   align-items: center;
