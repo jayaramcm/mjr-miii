@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="Assets/web/hero-poster.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=174">
+  <link rel="stylesheet" href="css/styles.css?v=200">
 </head>
 <body>
   <!-- Preloader: the MJR mark builds itself. Shown on first load and between
@@ -82,10 +83,9 @@
           <li><a href="#mplan" data-spot="plan"><span class="menu__num">02</span>Master Plan</a></li>
           <li><a href="#amenities" data-spot="amen"><span class="menu__num">03</span>Amenities</a></li>
           <li><a href="#location"><span class="menu__num">04</span>Location</a></li>
-          <li><a href="#project"><span class="menu__num">05</span>Project Status</a></li>
-          <li><a href="#about" data-spot="about"><span class="menu__num">06</span>About MJR</a></li>
-          <li><a href="#faq"><span class="menu__num">07</span>FAQs</a></li>
-          <li><a href="#contact"><span class="menu__num">08</span>Contact</a></li>
+          <li><a href="#about" data-spot="about"><span class="menu__num">05</span>About MJR</a></li>
+          <li><a href="#faq"><span class="menu__num">06</span>FAQs</a></li>
+          <li><a href="#contact"><span class="menu__num">07</span>Contact</a></li>
         </ol>
       </nav>
 
@@ -162,13 +162,6 @@
           <li><strong>120&ndash;550</strong><span>Sq. yd. plot sizes (approx.)</span></li>
           <li><strong class="hero__rera">P01600010465</strong><span>TG RERA No.</span></li>
         </ul>
-
-        <a class="hero__scroll" href="#overview" aria-label="Scroll to discover the township">
-          <span class="hero__scroll-label">Scroll to discover</span>
-          <span class="hero__scroll-ring" aria-hidden="true">
-            <svg viewBox="0 0 12 16" width="10" height="14"><path d="M6 0v14M1 9l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>
-          </span>
-        </a>
 
         <button class="hero__motion" id="videoToggle" type="button" aria-pressed="false" aria-label="Pause background video">
           <span class="hero__motion-icon" aria-hidden="true"></span>
@@ -532,94 +525,90 @@
                 <button class="amen-tabs__btn" type="button" data-amen-filter="relax" aria-pressed="false">Relax</button>
               </div>
             </header>
-            <ul class="amen-key" aria-label="Status labels">
-              <li><span class="status status--existing">Existing</span></li>
-              <li><span class="status status--dev">Under development</span></li>
-              <li><span class="status status--proposed">Proposed</span></li>
-            </ul>
-            <ul class="agrid" id="amenGrid">
-                <li class="agrid__card" data-cat="live" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/multipurpose-lawn.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Multipurpose lawn</h4>
-                    <p class="agrid__desc">Space for community gatherings</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="live" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/swimming-pool.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Swimming pool</h4>
-                    <p class="agrid__desc">Space to unwind and refresh</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="live" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/water-infrastructure.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Water infrastructure</h4>
-                    <p class="agrid__desc">A dedicated water tank</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="live" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/ev-charging.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">EV charging</h4>
-                    <p class="agrid__desc">A station planned on plots 1&ndash;3</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="play" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/children-play-area.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Children&rsquo;s play area</h4>
-                    <p class="agrid__desc">A dedicated space for play</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="play" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/outdoor-fitness-area.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Outdoor fitness area</h4>
-                    <p class="agrid__desc">For a workout in the open air</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="play" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/three-parks.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Three additional parks</h4>
-                    <p class="agrid__desc">Green spaces to walk, gather and play</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="relax" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/senior-citizen-park.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Senior citizen park</h4>
-                    <p class="agrid__desc">A dedicated setting for older adults</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="relax" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/pergolas-and-sit-outs.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Pergolas and sit-outs</h4>
-                    <p class="agrid__desc">One in each of the three parks</p>
-                  </div>
-                </li>
-                <li class="agrid__card" data-cat="relax" data-status="proposed">
-                  <figure class="agrid__photo"><img src="Assets/web/open-space.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
-                  <div class="agrid__body">
-                    <span class="status status--proposed">Proposed</span>
-                    <h4 class="agrid__title">Open space</h4>
-                    <p class="agrid__desc">For meditation and yoga</p>
-                  </div>
-                </li>
-            </ul>
-            <p class="amen-list__note">Images are artist&rsquo;s impressions.</p>
+            <div class="amen-carousel">
+              <div class="amen-carousel__viewport" id="amenViewport">
+                <ul class="agrid" id="amenGrid">
+                  <li class="agrid__card" data-cat="live">
+                    <figure class="agrid__photo"><img src="Assets/web/multipurpose-lawn.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Multipurpose lawn</h4>
+                      <p class="agrid__desc">Space for community gatherings</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="live">
+                    <figure class="agrid__photo"><img src="Assets/web/swimming-pool.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Swimming pool</h4>
+                      <p class="agrid__desc">Space to unwind and refresh</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="live">
+                    <figure class="agrid__photo"><img src="Assets/web/water-infrastructure.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Water infrastructure</h4>
+                      <p class="agrid__desc">A dedicated water tank</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="live">
+                    <figure class="agrid__photo"><img src="Assets/web/ev-charging.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">EV charging</h4>
+                      <p class="agrid__desc">A station planned on plots 1&ndash;3</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="play">
+                    <figure class="agrid__photo"><img src="Assets/web/children-play-area.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Children&rsquo;s play area</h4>
+                      <p class="agrid__desc">A dedicated space for play</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="play">
+                    <figure class="agrid__photo"><img src="Assets/web/outdoor-fitness-area.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Outdoor fitness area</h4>
+                      <p class="agrid__desc">For a workout in the open air</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="play">
+                    <figure class="agrid__photo"><img src="Assets/web/three-parks.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Three additional parks</h4>
+                      <p class="agrid__desc">Green spaces to walk, gather and play</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="relax">
+                    <figure class="agrid__photo"><img src="Assets/web/senior-citizen-park.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Senior citizen park</h4>
+                      <p class="agrid__desc">A dedicated setting for older adults</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="relax">
+                    <figure class="agrid__photo"><img src="Assets/web/pergolas-and-sit-outs.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Pergolas and sit-outs</h4>
+                      <p class="agrid__desc">One in each of the three parks</p>
+                    </div>
+                  </li>
+                  <li class="agrid__card" data-cat="relax">
+                    <figure class="agrid__photo"><img src="Assets/web/open-space.webp" alt="" loading="lazy" decoding="async" width="960" height="640"></figure>
+                    <div class="agrid__body">
+                      <h4 class="agrid__title">Open space</h4>
+                      <p class="agrid__desc">For meditation and yoga</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="amen-carousel__nav" aria-label="Carousel navigation">
+                <button class="amen-carousel__btn amen-carousel__btn--prev" id="amenPrevBtn" type="button" aria-label="Previous amenities">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="amen-carousel__btn amen-carousel__btn--next" id="amenNextBtn" type="button" aria-label="Next amenities">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -637,63 +626,74 @@
         <p class="conn__tagline">Daily travel is simpler, and so is the way back to the city.</p>
       </header>
 
-      <!-- Pinned stage: each scroll plays one video start to finish, fast through the middle,
-           then its card rises in; the next video picks up from its first frame -->
+      <!-- Pinned stage: starts on the MJR entrance image, then the sidebar slides in from the right,
+           pushed to the left by the destination image pane; each subsequent image opens from bottom-right -->
       <div class="conn__stage">
         <div class="conn__scene">
-          <video class="conn__video" src="Assets/mjr-location-1-scrub.mp4" muted playsinline preload="none" aria-hidden="true"></video>
-          <video class="conn__video" src="Assets/mjr-location-2-scrub.mp4" muted playsinline preload="none" aria-hidden="true"></video>
-          <video class="conn__video" src="Assets/mjr-location-3-scrub.mp4" muted playsinline preload="none" aria-hidden="true"></video>
-          <video class="conn__video" src="Assets/mjr-location-4-scrub.mp4" muted playsinline preload="none" aria-hidden="true"></video>
-          <article class="conn__card">
-            <h3 class="conn__card-title">To Hyderabad</h3>
-            <ul class="conn__card-list">
-              <li>Financial District</li>
-              <li>Gachibowli</li>
-              <li>Rajiv Gandhi International Airport</li>
-              <li>Outer Ring Road</li>
-            </ul>
-            <p class="conn__card-note">with the proposed Regional Ring Road in the larger picture.</p>
-          </article>
-          <article class="conn__card">
-            <h3 class="conn__card-title">Education nearby</h3>
-            <ul class="conn__card-list">
-              <li>Global International School</li>
-              <li>Nishita College of Engineering &amp; Technology</li>
-              <li>Skill University</li>
-            </ul>
-          </article>
-          <article class="conn__card">
-            <h3 class="conn__card-title">Healthcare nearby</h3>
-            <ul class="conn__card-list">
-              <li>Bhoolaxmi Memorial Hospital</li>
-              <li>Grace Multispeciality Hospital</li>
-              <li>Madhavanji Super Speciality Hospital &amp; College</li>
-            </ul>
-          </article>
-          <article class="conn__card">
-            <h3 class="conn__card-title">Around Kalwakurthy</h3>
-            <ul class="conn__card-list">
-              <li>Umamaheshwaram Temple</li>
-              <li>Gollatha Gudi (Alwanpalli Temple)</li>
-              <li>Nettempadu irrigation projects</li>
-              <li>Statue of Gautama Buddha at Nagarkurnool</li>
-            </ul>
-          </article>
-        </div>
+          <img class="conn__intro-img" src="Assets/MJR Luxury Township Entrance and Mountains.png" alt="MJR Township entrance with mountains in the background" decoding="async">
 
-        <!-- After the last card: the scene slides left to a strip and the RERA panel follows in -->
-        <div class="conn__rera">
-          <div class="conn__rera-copy">
-            <h3 class="conn__rera-title">Built around the right foundation.</h3>
-            <p class="conn__rera-desc">MJR Township is a registered project under <strong>TG RERA, No. P01600010465</strong>. It is developed by <strong>MJR Infra Developers on Survey No. 720 &amp; 729,</strong> Tirupati Highway (NH 167K), Kalwakurthy, Nagarkurnool (D) &ndash; 509 324, Telangana.</p>
-            <p class="conn__rera-note">Project documents and approvals are available for review. Ask our team, and we will walk you through them before you decide.</p>
-            <div class="conn__rera-ctas">
-              <a class="btn btn--gold conn__rera-btn" href="#projectDocs">Project documents</a>
-              <a class="btn conn__rera-call" href="tel:+919010055596">Call us</a>
+          <aside class="conn__sidebar" id="connSidebar" aria-label="Connectivity highlights">
+            <div class="conn__acc">
+              <article class="conn__acc-item is-open">
+                <h3 class="conn__acc-title">To Hyderabad</h3>
+                <div class="conn__acc-body">
+                  <div class="conn__acc-inner">
+                    <ul class="conn__card-list">
+                      <li>Financial District</li>
+                      <li>Gachibowli</li>
+                      <li>Rajiv Gandhi International Airport</li>
+                      <li>Outer Ring Road</li>
+                    </ul>
+                    <p class="conn__card-note">with the proposed Regional Ring Road in the larger picture.</p>
+                  </div>
+                </div>
+              </article>
+              <article class="conn__acc-item">
+                <h3 class="conn__acc-title">Education<br>nearby</h3>
+                <div class="conn__acc-body">
+                  <div class="conn__acc-inner">
+                    <ul class="conn__card-list">
+                      <li>Global International School</li>
+                      <li>Nishita College of Engineering &amp; Technology</li>
+                      <li>Skill University</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+              <article class="conn__acc-item">
+                <h3 class="conn__acc-title">Healthcare<br>nearby</h3>
+                <div class="conn__acc-body">
+                  <div class="conn__acc-inner">
+                    <ul class="conn__card-list">
+                      <li>Bhoolaxmi Memorial Hospital</li>
+                      <li>Grace Multispeciality Hospital</li>
+                      <li>Madhavanji Super Speciality Hospital &amp; College</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+              <article class="conn__acc-item">
+                <h3 class="conn__acc-title">Around<br>Kalwakurthy</h3>
+                <div class="conn__acc-body">
+                  <div class="conn__acc-inner">
+                    <ul class="conn__card-list">
+                      <li>Umamaheshwaram Temple</li>
+                      <li>Gollatha Gudi (Alwanpalli Temple)</li>
+                      <li>Nettempadu irrigation projects</li>
+                      <li>Statue of Gautama Buddha at Nagarkurnool</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
             </div>
+          </aside>
+
+          <div class="conn__gallery" id="connGallery">
+            <img class="conn__dest-img" src="Assets/Modern Tech District and Airport Skyline.png" alt="To Hyderabad — Financial District, Gachibowli and Rajiv Gandhi International Airport skyline" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/Aerial Campus Panorama with Flags.png" alt="Education nearby — university and school campuses" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/Modern Hospital Campus in a Lush Cityscape.png" alt="Healthcare nearby — modern hospital campus" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/Temples, Reservoirs and Buddha Vista.png" alt="Around Kalwakurthy — temples, reservoirs and Gautama Buddha statue" loading="lazy" decoding="async">
           </div>
-          <img class="conn__folder" src="Assets/Telangana RERA Certificate on Folder.png" alt="Telangana State Real Estate Regulatory Authority registration certificate for MJR Township" loading="lazy" decoding="async">
         </div>
       </div>
 
@@ -775,7 +775,7 @@
            in, a stack of cards lands in the centre and each scroll sends the top
            card up as the view eases in; then the leadership letter (js/about.js) -->
       <div class="about__stage">
-        <img class="about__paper" src="Assets/paper-texture-2.png" alt="" aria-hidden="true" decoding="async" data-nav="light">
+        <img class="about__paper" src="Assets/paper-texture-2.png" alt="" aria-hidden="true" decoding="async">
         <img class="about__bg" src="Assets/23.png" alt="" aria-hidden="true" decoding="async">
         <div class="about__head">
           <h2 class="about__title" id="aboutTitle">The team behind the foundation.</h2>
@@ -812,8 +812,8 @@
             <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
           </article>
         </div>
-        <!-- Option B: Plain ivory #F5F1E8 split view with scroll-revealed facts and construction video -->
-        <div class="about__split" data-nav="light">
+        <!-- Option B: Plain ivory #F5F1E8 panel that slides in from the right with scroll-revealed facts and construction video -->
+        <div class="about__split">
           <div class="about__split-copy">
             <div class="about__split-qa">
               <p class="about__split-q"><span>Q.</span> How will people live here, five and ten years from now?</p>
@@ -958,12 +958,11 @@
         <address class="footer__addr">Survey No. 720 &amp; 729, Tirupati Highway (NH 167K), Kalwakurthy, Nagarkurnool (D) &ndash; 509 324, Telangana, India</address>
       </div>
       <nav class="footer__nav" aria-label="Footer">
-        <a href="#overview">Overview</a>
-        <a href="#mplan">Master plan</a>
-        <a href="#amenities">Amenities</a>
+        <a href="#overview" data-spot="introducing">Overview</a>
+        <a href="#mplan" data-spot="plan">Master plan</a>
+        <a href="#amenities" data-spot="amen">Amenities</a>
         <a href="#location">Location</a>
-        <a href="#project">Project status</a>
-        <a href="#about">About MJR</a>
+        <a href="#about" data-spot="about">About MJR</a>
         <a href="#faq">FAQ</a>
         <a href="#contact">Contact</a>
         <a href="privacy.html">Privacy policy</a>
@@ -1042,10 +1041,10 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="js/site-data.js?v=3" defer></script>
   <script src="js/plots-data.js?v=16" defer></script>
-  <script src="js/main.js?v=90" defer></script>
-  <script src="js/amenities.js?v=42" defer></script>
-  <script src="js/connectivity.js?v=30" defer></script>
-  <script src="js/about.js?v=51" defer></script>
-  <script src="js/sections.js?v=37" defer></script>
+  <script src="js/main.js?v=93" defer></script>
+  <script src="js/amenities.js?v=49" defer></script>
+  <script src="js/connectivity.js?v=34" defer></script>
+  <script src="js/about.js?v=54" defer></script>
+  <script src="js/sections.js?v=46" defer></script>
 </body>
 </html>

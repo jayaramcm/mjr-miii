@@ -61,6 +61,18 @@
 
   // 3. FAQ: native <details>; opening one closes the others, and the answer
   //    eases open under its question
+  const faqSection = document.getElementById('faq');
+  if (faqSection && window.gsap && window.ScrollTrigger && !reduceMotion) {
+    ScrollTrigger.create({
+      trigger: faqSection,
+      start: 'top top',
+      end: () => '+=' + Math.round(window.innerHeight * 0.9),
+      pin: true,
+      pinSpacing: true,
+      invalidateOnRefresh: true,
+    });
+  }
+
   const qaItems = [...document.querySelectorAll('.faq .qa')];
   qaItems.forEach((item) => {
     const body = item.querySelector('.qa__a');
@@ -71,13 +83,13 @@
       qaItems.forEach((other) => {
         if (other === item || !other.open) return;
         const ob = other.querySelector('.qa__a');
-        gsap.to(ob, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { other.open = false; gsap.set(ob, { clearProps: 'height' }); } });
+        gsap.to(ob, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { other.open = false; gsap.set(ob, { clearProps: 'height' }); ScrollTrigger.refresh(); } });
       });
       if (opening) {
         item.open = true;
-        gsap.fromTo(body, { height: 0 }, { height: 'auto', duration: 0.45, ease: 'power2.out', clearProps: 'height' });
+        gsap.fromTo(body, { height: 0 }, { height: 'auto', duration: 0.45, ease: 'power2.out', clearProps: 'height', onComplete: () => ScrollTrigger.refresh() });
       } else {
-        gsap.to(body, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { item.open = false; gsap.set(body, { clearProps: 'height' }); } });
+        gsap.to(body, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { item.open = false; gsap.set(body, { clearProps: 'height' }); ScrollTrigger.refresh(); } });
       }
     });
   });
@@ -154,16 +166,68 @@
   const updated = window.MJR_PLOTS && window.MJR_PLOTS.UPDATED;
   if (avail && updated) { avail.dateTime = updated; avail.textContent = fmtDate(updated); }
 
-  // Amenity tabs: filter the grid; name and status stay on every card
+  // Amenity tabs & sliding carousel
   const tabs = [...document.querySelectorAll('[data-amen-filter]')];
+  const amenGrid = document.getElementById('amenGrid');
   const acards = [...document.querySelectorAll('#amenGrid .agrid__card')];
+  const prevBtn = document.getElementById('amenPrevBtn');
+  const nextBtn = document.getElementById('amenNextBtn');
+  let amenIdx = 0;
+
+  const getAmenCols = () => {
+    if (!amenGrid) return 3;
+    const raw = parseFloat(getComputedStyle(amenGrid).getPropertyValue('--amen-cols'));
+    return isNaN(raw) || raw < 1 ? 3 : raw;
+  };
+
+  const updateAmenCarousel = () => {
+    if (!amenGrid) return;
+    const visible = acards.filter((c) => !c.hidden);
+    const cols = getAmenCols();
+    const maxIdx = Math.max(0, Math.ceil(visible.length - cols));
+    if (amenIdx > maxIdx) amenIdx = maxIdx;
+    if (amenIdx < 0) amenIdx = 0;
+
+    if (visible.length > 0 && amenIdx > 0) {
+      const firstCard = visible[0];
+      const gap = parseFloat(getComputedStyle(amenGrid).columnGap || getComputedStyle(amenGrid).gap || '0') || 0;
+      const step = firstCard.getBoundingClientRect().width + gap;
+      const viewportW = amenGrid.parentElement ? amenGrid.parentElement.clientWidth : amenGrid.clientWidth;
+      const totalW = visible.length * firstCard.getBoundingClientRect().width + Math.max(0, visible.length - 1) * gap;
+      const maxOffset = Math.max(0, totalW - viewportW);
+      const offset = Math.min(amenIdx * step, maxOffset);
+      amenGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    } else {
+      amenGrid.style.transform = 'translate3d(0, 0, 0)';
+    }
+
+    if (prevBtn) prevBtn.disabled = amenIdx <= 0;
+    if (nextBtn) nextBtn.disabled = amenIdx >= maxIdx;
+  };
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      amenIdx = Math.max(0, amenIdx - 1);
+      updateAmenCarousel();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      amenIdx += 1;
+      updateAmenCarousel();
+    });
+  }
+  window.addEventListener('resize', updateAmenCarousel, { passive: true });
+  updateAmenCarousel();
+
   tabs.forEach((tab) => tab.addEventListener('click', () => {
     const f = tab.dataset.amenFilter;
     tabs.forEach((t) => { const on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-pressed', String(on)); });
     const show = acards.filter((c) => f === 'all' || c.dataset.cat === f);
     acards.forEach((c) => { c.hidden = !show.includes(c); });
+    amenIdx = 0;
+    updateAmenCarousel();
     if (!reduceMotion && window.gsap) gsap.fromTo(show, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out', clearProps: 'transform' });
-    // On a tall (phone) grid the filtered cards sit at its top: bring that into view
     const first = show[0];
     const spot = (window.MJR_SPOTS || {}).amenTabs;
     if (first && spot && window.MJR && window.MJR.scrollToEl && first.getBoundingClientRect().bottom < 120) {
@@ -246,23 +310,6 @@
     window.addEventListener('resize', queue);
     window.addEventListener('load', queue);
     checkNavy();
-  }
-
-  // About slides up over the end of Location: once the Location block's bottom
-  // reaches the bottom of the screen it holds still (no extra scroll space is
-  // added) while About rises over it, until About's top reaches the top
-  const locBlock = document.querySelector('.loc-info');
-  const aboutSection = document.getElementById('about');
-  if (locBlock && aboutSection && window.gsap && window.ScrollTrigger && !reduceMotion) {
-    ScrollTrigger.create({
-      trigger: locBlock,
-      start: 'bottom bottom',
-      endTrigger: aboutSection,
-      end: 'top top',
-      pin: true,
-      pinSpacing: false,
-      invalidateOnRefresh: true,
-    });
   }
 
   // Phone action bar: tucked away over the hero and the pinned plan, where it would cover controls

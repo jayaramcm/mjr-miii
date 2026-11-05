@@ -1,162 +1,170 @@
 /* 04. Location: Connectivity
    1. Title lines slide up, then the description and tagline follow.
-   2. The video stage pins for four chapters. In each, one scroll scrubs that
-      video from first to last frame, easing in and out so the middle rushes by,
-      then its card rises in. The next chapter swaps to the next video at its
-      first frame while the previous card slides out to the left. */
+   2. The stage starts on the MJR entrance image; as the user scrolls:
+      - The navy sidebar slides in from the right and stops briefly.
+      - The destination gallery (starting with Modern Tech District and Airport Skyline.png
+        for "To Hyderabad") pushes the sidebar from the right across to the left edge.
+      - Each subsequent destination image opens from the bottom-right corner while the
+        left sidebar accordion closes the previous item and opens the active item:
+        * Education nearby -> Aerial Campus Panorama with Flags.png
+        * Healthcare nearby -> Modern Hospital Campus in a Lush Cityscape.png
+        * Around Kalwakurthy -> Temples, Reservoirs and Buddha Vista.png */
 (() => {
   const section = document.getElementById('location');
   if (!section) return;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const stage = section.querySelector('.conn__stage');
-  const videos = [...section.querySelectorAll('.conn__video')];
-  const cards = [...section.querySelectorAll('.conn__card')];
-  const N = videos.length;
+  const introImg = section.querySelector('.conn__intro-img');
+  const sidebar = section.querySelector('.conn__sidebar');
+  const gallery = section.querySelector('.conn__gallery');
+  const destImgs = [...section.querySelectorAll('.conn__dest-img')];
+  const accItems = [...section.querySelectorAll('.conn__acc-item')];
+  const accBodies = accItems.map((item) => item.querySelector('.conn__acc-body'));
+  const accInners = accItems.map((item) => item.querySelector('.conn__acc-inner'));
 
   if (!window.gsap || !window.ScrollTrigger || reduceMotion.matches) {
-    // Static fallback: first video's last frame with its card
-    const v = videos[0];
-    v.preload = 'auto';
-    const end = () => { if (v.duration) v.currentTime = v.duration; };
-    v.addEventListener('loadedmetadata', end, { once: true });
-    end();
-    cards[0].style.opacity = '1';
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
 
-  // Videos download only as the section approaches (they start with preload=none)
+  // Preload lazy destination images as the section approaches
   ScrollTrigger.create({
     trigger: section,
     start: 'top bottom+=150%',
     once: true,
-    onEnter: () => videos.forEach((v) => { v.preload = 'auto'; v.load(); }),
+    onEnter: () => destImgs.forEach((img) => { img.loading = 'eager'; }),
   });
 
   // 1. Header reveal
-  const reveal = { trigger: section.querySelector('.conn__header'), start: 'top 75%', toggleActions: 'play none none reverse' };
+  const reveal = {
+    trigger: section.querySelector('.conn__header'),
+    start: 'top 75%',
+    toggleActions: 'play none none reverse',
+  };
   gsap.timeline({ scrollTrigger: reveal })
     .from(section.querySelectorAll('.conn__line > span'), { yPercent: 110, duration: 1.1, stagger: 0.15, ease: 'power3.out' })
     .from(section.querySelector('.conn__lead'), { y: 30, opacity: 0, duration: 0.9, ease: 'power2.out' }, '-=0.5')
     .from(section.querySelector('.conn__tagline'), { y: 30, opacity: 0, duration: 0.9, ease: 'power2.out' }, '-=0.6');
 
-  // 2. Scroll-scrubbed videos: slow at both ends, fast through the middle
-  const SCREENS = window.innerWidth <= 760 ? 0.7 : 0.85; // scroll length of one chapter, in screens
-  const PLAY = 0.75; // share of a chapter spent on the video; the rest brings in the card
-  const ease = gsap.parseEase('power3.inOut');
+  // 2. Pinned stage timeline
+  const setInitialStage = () => {
+    const vw = window.innerWidth;
+    const barW = sidebar.offsetWidth;
+    gsap.set(introImg, { scale: 1 });
+    // Sidebar starts completely off-screen to the right (x = vw)
+    gsap.set(sidebar, { x: vw });
+    // Gallery CSS left is barW, so x = vw - barW places its left edge at vw (flush right)
+    gsap.set(gallery, { x: vw - barW });
 
-  // One seeker per video, so a slow seek never blocks the next target
-  const seekers = videos.map((video) => {
-    const s = { target: 0, busy: false };
-    s.go = () => {
-      if (!video.duration) return;
-      const t = ease(s.target) * (video.duration - 0.05);
-      if (s.busy || Math.abs(video.currentTime - t) < 0.01) return;
-      s.busy = true;
-      video.currentTime = t;
-    };
-    video.addEventListener('seeked', () => { s.busy = false; s.go(); });
-    video.addEventListener('loadedmetadata', s.go);
-    return s;
-  });
-
-  let active = 0;
-  gsap.set(cards, { y: 60 });
-
-  // 3. Outro after the last card: hold, the scene slides left to a strip as the
-  //    RERA panel follows in at the same speed, then the folder rolls into view
-  const scene = section.querySelector('.conn__scene');
-  const rera = section.querySelector('.conn__rera');
-  const folder = section.querySelector('.conn__folder');
-  const reraCopy = section.querySelector('.conn__rera-copy');
-  // Outro timing, in screens of scroll after the last chapter
-  const HOLD = 0.35; // last frame and its card stay put
-  const SLIDE = 0.7; // scene slides left as the panel slides in
-  const ROLL = 0.6; // folder rolls in, starting just before the slide ends
-  const ROLL_AT = HOLD + SLIDE - 0.2;
-  const EXIT_AT = ROLL_AT + ROLL + 0.45; // short hold on the finished panel first
-  const EXIT = 0.5; // strip and text slide out left, the folder out right, leaving cream
-  const OUTRO = EXIT_AT + EXIT;
-  const slideEase = gsap.parseEase('power2.inOut');
-  const rollEase = gsap.parseEase('power3.out');
-
-  // Scene and panel are set from one shared value every frame, so they always
-  // move together and scrolling back simply runs the same maths in reverse
-  const renderOutro = (t) => {
-    const isPhone = window.innerWidth <= 760;
-    const w = rera.offsetWidth; // the panel's width is exactly how far the scene moves
-    const s = slideEase(gsap.utils.clamp(0, 1, (t - HOLD) / SLIDE));
-    const r = rollEase(gsap.utils.clamp(0, 1, (t - ROLL_AT) / ROLL));
-
-    if (isPhone) {
-      const exitY = -slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerHeight * 1.15;
-      const enterY = window.innerHeight * 0.65 * (1 - r);
-      gsap.set(scene, { x: -w * s, y: exitY });
-      gsap.set(rera, { x: w * (1 - s) });
-      gsap.set(reraCopy, { x: 0, y: exitY, yPercent: 0 });
-      gsap.set(folder, {
-        opacity: 1,
-        x: 0,
-        y: enterY + exitY,
-        rotation: 38 + (-15 - 38) * r,
-      });
-    } else {
-      const out = slideEase(gsap.utils.clamp(0, 1, (t - EXIT_AT) / EXIT)) * window.innerWidth;
-      gsap.set(scene, { x: -w * s - out, y: 0 });
-      gsap.set(rera, { x: w * (1 - s) });
-      gsap.set(reraCopy, { x: -out, y: 0, yPercent: -50 });
-      gsap.set(folder, {
-        opacity: 1,
-        x: window.innerWidth * 0.45 * (1 - r) + out,
-        y: 0,
-        rotation: 38 + (-15 - 38) * r,
-      });
-    }
-  };
-  renderOutro(0);
-
-  ScrollTrigger.create({
-    trigger: stage,
-    start: 'top top',
-    end: () => '+=' + window.innerHeight * (SCREENS * N + OUTRO),
-    pin: true,
-    scrub: true,
-    invalidateOnRefresh: true,
-    onUpdate: (self) => {
-      const total = SCREENS * N + OUTRO;
-      const done = self.progress * total;
-      renderOutro(Math.max(0, done - SCREENS * N));
-      const pos = Math.min(done / SCREENS, N - 0.0001);
-      const i = Math.floor(pos);
-      const local = pos - i;
-
-      if (i !== active) {
-        videos[active].style.visibility = 'hidden';
-        active = i;
+    destImgs.forEach((img, idx) => {
+      if (idx === 0) {
+        gsap.set(img, { clipPath: 'inset(0% 0% 0% 0%)', scale: 1, zIndex: 1 });
+      } else {
+        gsap.set(img, { clipPath: 'inset(100% 0% 0% 100%)', scale: 1.06, zIndex: idx + 1 });
       }
-      // Earlier videos rest on their last frame, later ones on their first
-      seekers.forEach((s, k) => {
-        if (k < i) { s.target = 1; s.go(); }
-        else if (k > i) { s.target = 0; s.go(); }
-      });
+    });
 
-      const video = videos[i];
-      video.style.visibility = 'visible';
-      const p = Math.min(1, local / PLAY);
-      seekers[i].target = p;
-      seekers[i].go();
-      // Current card rises in at the end of its video; the previous card rides
-      // out to the left on the same eased curve as the next video's playback
-      const c = Math.max(0, (local - PLAY) / (1 - PLAY));
-      const out = ease(Math.min(1, p / 0.8)); // same curve as the video, done by 80% of it
-      cards.forEach((card, k) => {
-        if (k === i) gsap.set(card, { opacity: c, x: 0, y: 60 * (1 - c) });
-        else if (k === i - 1) gsap.set(card, { opacity: 1, y: 0, x: -(card.offsetLeft + card.offsetWidth + 40) * out });
-        else gsap.set(card, { opacity: 0, x: 0, y: 60 });
-      });
+    accBodies.forEach((body, idx) => {
+      if (idx === 0) {
+        gsap.set(body, { height: accInners[0].offsetHeight, opacity: 1 });
+      } else {
+        gsap.set(body, { height: 0, opacity: 0 });
+      }
+    });
+  };
+
+  setInitialStage();
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: stage,
+      start: 'top top',
+      end: () => '+=' + window.innerHeight * (window.innerWidth <= 760 ? 4.2 : 5.0),
+      pin: true,
+      scrub: 0.65,
+      invalidateOnRefresh: true,
+      onRefreshInit: setInitialStage,
     },
   });
+
+  // Brief hold on the full-screen MJR entrance image
+  tl.to(introImg, { scale: 1.02, duration: 0.25, ease: 'none' });
+
+  // Step 1: Sidebar slides smoothly in from the right edge and stops on the right side
+  tl.to(sidebar, {
+    x: () => window.innerWidth - sidebar.offsetWidth,
+    duration: 0.8,
+    ease: 'power2.inOut',
+  });
+
+  // Stop for a scroll while the sidebar rests on the right
+  tl.to({}, { duration: 0.4 });
+
+  // Step 2: Outside the view beside the bar on the right, Modern Tech District and Airport Skyline.png
+  // pushes the sidebar across into view to the left edge
+  tl.to(
+    sidebar,
+    {
+      x: 0,
+      duration: 0.95,
+      ease: 'power2.inOut',
+    },
+    'pushIn'
+  );
+  tl.to(
+    gallery,
+    {
+      x: 0,
+      duration: 0.95,
+      ease: 'power2.inOut',
+    },
+    'pushIn'
+  );
+
+  // Hold on "To Hyderabad" + Modern Tech District and Airport Skyline.png
+  tl.to({}, { duration: 0.45 });
+
+  // Step 3: Subsequent destination images open from the bottom-right corner while the
+  // left sidebar closes the previous category and expands the next category
+  for (let k = 1; k < destImgs.length; k++) {
+    const label = `chapter_${k}`;
+    tl.to(
+      destImgs[k],
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        scale: 1,
+        duration: 0.9,
+        ease: 'power2.inOut',
+      },
+      label
+    );
+
+    tl.to(
+      accBodies[k - 1],
+      {
+        height: 0,
+        opacity: 0,
+        duration: 0.75,
+        ease: 'power2.inOut',
+      },
+      label
+    );
+
+    tl.to(
+      accBodies[k],
+      {
+        height: () => accInners[k].offsetHeight,
+        opacity: 1,
+        duration: 0.75,
+        ease: 'power2.inOut',
+      },
+      label
+    );
+
+    // Hold on each chapter
+    tl.to({}, { duration: 0.45 });
+  }
 
   window.addEventListener('load', () => ScrollTrigger.refresh());
 })();

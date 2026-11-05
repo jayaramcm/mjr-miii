@@ -995,7 +995,7 @@ body.is-scrolling .hero__content {
 /* Base strip: facts left, scroll cue centred, motion control right. */
 .hero__base {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto;
   align-items: end;
   gap: 1.5rem;
   padding: 1.5rem var(--gutter) clamp(1.25rem, 3vh, 2rem);
@@ -1548,7 +1548,8 @@ body.is-scrolling .hero__content {
 }
 
 .mplan__shape polygon {
-  fill: #CF9E39; /* selected plot */
+  fill: #CF9E39;
+  /* selected plot */
   stroke: #FFFFFF;
   stroke-width: 1px;
   opacity: 0;
@@ -3308,7 +3309,7 @@ body.is-scrolling .hero__content {
    stage and lays every layer over it for the scrubbed sequence. */
 .amen {
   position: relative;
-  background: var(--navy-900);
+  background: #36512B;
   color: var(--ivory);
 }
 
@@ -3546,7 +3547,7 @@ body.is-scrolling .hero__content {
   position: absolute;
   top: 0;
   bottom: 0;
-  background: var(--navy-900);
+  background: #36512B;
 }
 
 .amen__bldg--1 {
@@ -3580,8 +3581,29 @@ body.is-scrolling .hero__content {
   right: 0;
   top: 0;
   height: 260vh;
-  background: var(--navy-900);
+  background: #36512B;
   will-change: transform;
+}
+
+.amen__bldg::before,
+.amen--live .amen__navy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #263B1D;
+  background-image: radial-gradient(circle 220px at var(--mx, -9999px) var(--my, -9999px),
+      #E9C46F 0%,
+      #CA982C 45%,
+      #263B1D 100%);
+  -webkit-mask-image: url("../Assets/cube-pattern.svg?v=1");
+  mask-image: url("../Assets/cube-pattern.svg?v=1");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-position: top center;
+  mask-position: top center;
+  -webkit-mask-size: 141px 162px;
+  mask-size: 141px 162px;
+  pointer-events: none;
 }
 
 /* Question, rule, heading, photo and caption sit in one column that
@@ -4376,7 +4398,8 @@ body.is-scrolling .hero__content {
   text-align: center;
   color: #fff;
   text-shadow: 0 1px 12px rgba(16, 42, 84, 0.25);
-  z-index: 2; /* sky's cloud bank paints over the top of the video stage */
+  z-index: 2;
+  /* sky's cloud bank paints over the top of the video stage */
 }
 
 /* Sky behind the header; its soft cloud bank hangs past the header's bottom
@@ -4431,20 +4454,22 @@ body.is-scrolling .hero__content {
   overflow: hidden;
 }
 
-.conn__video {
+.conn__intro-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   background: #4494E4;
+  z-index: 1;
 }
 
-/* Videos and cards share a layer that slides left at the end */
+/* Intro image, sidebar and destination gallery share a layer that slides left at the end */
 .conn__scene {
   position: absolute;
   inset: 0;
   z-index: 1;
+  overflow: hidden;
 }
 
 /* RERA panel: waits off to the right, then follows the scene in.
@@ -4558,53 +4583,98 @@ body.is-scrolling .hero__content {
   }
 }
 
-/* Videos stack; only the active one shows (js/connectivity.js) */
-.conn__video:not(:first-of-type) {
-  visibility: hidden;
-}
-
-/* Navy card with an inset gold keyline, after location-card.svg */
-.conn__card {
+/* Navy connectivity sidebar and destination gallery (js/connectivity.js) */
+.conn__sidebar {
   position: absolute;
-  left: 6.25vw;
-  top: 11vh;
-  width: clamp(260px, 25vw, 520px);
-  padding: clamp(28px, 2.9vw, 56px);
-  background: #F5F1E8;
-  color: #484848;
-  opacity: 0;
-  box-shadow: 0 30px 60px -20px rgba(29, 40, 86, 0.45);
-  isolation: isolate; /* keeps the texture layer behind the text */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 31.25vw;
+  padding: calc(var(--bar-h) + clamp(0.75rem, 2vh, 2rem)) clamp(1.6rem, 3.1vw, 3.6rem) clamp(1.25rem, 3vh, 3rem);
+  background: #07163B;
+  color: #F5F1E8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 3;
+  will-change: transform;
 }
 
-/* Paper texture over the ivory, at 80% */
-.conn__card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url("../Assets/paper-texture.png") center / 240px auto;
-  opacity: 0.8;
-  pointer-events: none;
+.conn__acc {
+  display: flex;
+  flex-direction: column;
 }
 
+.conn__acc-item {
+  padding: clamp(0.8rem, 1.45vh, 1.3rem) 0;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.16);
+}
 
-.conn__card-title {
-  margin: 0 0 1.1vw;
-  font: 400 clamp(1.3rem, 2vw, 2.6rem) / 1.15 var(--f-display);
+.conn__acc-item:first-child {
+  padding-top: 0;
+}
+
+.conn__acc-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.conn__acc-title {
+  margin: 0;
+  font: 400 clamp(1.25rem, 1.9vw, 2.15rem) / 1.18 var(--f-display);
   text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: #CA982C;
+}
+
+.conn__acc-body {
+  overflow: hidden;
+  will-change: height, opacity;
+}
+
+.conn__acc-item:not(.is-open) .conn__acc-body {
+  height: 0;
+  opacity: 0;
+}
+
+.conn__acc-inner {
+  padding-top: 0.85rem;
 }
 
 .conn__card-list {
   margin: 0;
-  padding-left: 1.3em;
-  font: 400 clamp(0.95rem, 1.3vw, 1.7rem) / 1.45 var(--f-ui);
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+  font: 400 clamp(0.9rem, 1.1vw, 1.25rem) / 1.48 var(--f-ui);
+  color: #F5F1E8;
 }
 
 .conn__card-note {
-  margin: 1.2vw 0 0;
-  font: 600 clamp(0.95rem, 1.3vw, 1.7rem) / 1.45 var(--f-ui);
+  margin: 0.8rem 0 0;
+  font: italic 400 clamp(0.88rem, 1.05vw, 1.18rem) / 1.48 var(--f-ui);
+  color: rgba(245, 241, 232, 0.92);
+}
+
+.conn__gallery {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 31.25vw;
+  width: 68.75vw;
+  overflow: hidden;
+  z-index: 2;
+  will-change: transform;
+}
+
+.conn__dest-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 100% 100%;
+  will-change: clip-path, transform;
 }
 
 @media (max-width: 760px) {
@@ -4615,15 +4685,13 @@ body.is-scrolling .hero__content {
 
   .conn__header::before {
     bottom: -48px;
-    background: linear-gradient(
-      to bottom,
-      #0684F6 0%,
-      #1E8BF0 38%,
-      #3691E8 68%,
-      #4494E4 calc(100% - 48px),
-      rgba(68, 148, 228, 0.55) calc(100% - 24px),
-      rgba(74, 154, 232, 0) 100%
-    );
+    background: linear-gradient(to bottom,
+        #0684F6 0%,
+        #1E8BF0 38%,
+        #3691E8 68%,
+        #4494E4 calc(100% - 48px),
+        rgba(68, 148, 228, 0.55) calc(100% - 24px),
+        rgba(74, 154, 232, 0) 100%);
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -4633,11 +4701,41 @@ body.is-scrolling .hero__content {
     max-width: none;
   }
 
-  .conn__card {
-    left: 11vw;
-    top: auto;
-    bottom: 6vh;
-    width: 78vw;
+  .conn__sidebar {
+    width: 46vw;
+    padding: calc(var(--bar-h) + 0.5rem) 0.85rem calc(54px + 0.5rem);
+  }
+
+  .conn__gallery {
+    left: 46vw;
+    width: 54vw;
+  }
+
+  .conn__acc-item {
+    padding: clamp(0.45rem, 1.1svh, 0.8rem) 0;
+  }
+
+  .conn__acc-inner {
+    padding-top: 0.45rem;
+  }
+
+  .conn__acc-title {
+    font-size: clamp(0.88rem, 3.4vw, 1.15rem);
+  }
+
+  .conn__card-list {
+    padding-left: 1rem;
+    gap: 0.2rem;
+  }
+
+  .conn__card-list,
+  .conn__card-note {
+    font-size: clamp(0.72rem, 2.6vw, 0.88rem);
+    line-height: 1.38;
+  }
+
+  .conn__card-note {
+    margin-top: 0.45rem;
   }
 
 }
@@ -4697,16 +4795,19 @@ body.is-scrolling .hero__content {
 /* About */
 .about {
   padding: 0 0 clamp(4rem, 8vw, 8rem);
+  background: var(--navy-900);
+  color: #F5F1E8;
 }
 
-/* Pinned About stage: title and layout sketches on cream, then the aerial
-   view behind a stack of five paper cards (js/about.js) */
+/* Pinned About stage: continues on Location's navy background for the title
+   and layout sketches, then the ivory facts & construction panel slides in
+   from the right (js/about.js) */
 .about__stage {
   position: relative;
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: #F5F1E8;
+  background: var(--navy-900);
 }
 
 /* Aerial view: revealed through the ink as it bleeds open (js/about.js) */
@@ -4738,7 +4839,7 @@ body.is-scrolling .hero__content {
   font: 400 clamp(1.6rem, 3vw, 3.9rem) / 1.12 var(--f-display);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--navy-900);
+  color: #F5F1E8;
 }
 
 /* Paper fades in under the sketches; the aerial view later fades in over it */
@@ -4749,6 +4850,7 @@ body.is-scrolling .hero__content {
   height: 100%;
   object-fit: cover;
   opacity: 0;
+  display: none;
 }
 
 /* Sketches stack in one rotating frame and cross-fade (js/about.js).
@@ -4781,12 +4883,13 @@ body.is-scrolling .hero__content {
 .about__line {
   margin: 0 0 0.4vw;
   font: 400 clamp(0.95rem, 1.6vw, 2rem) / 1.4 var(--f-ui);
-  color: #484848;
+  color: rgba(245, 241, 232, 0.88);
   opacity: 0;
 }
 
 .about__line--strong {
   font-weight: 600;
+  color: #E9C46F;
 }
 
 
@@ -4838,7 +4941,7 @@ body.is-scrolling .hero__content {
   color: var(--navy-900);
 }
 
-.about__fact + .about__foot {
+.about__fact+.about__foot {
   margin-top: 0;
 }
 
@@ -4887,12 +4990,16 @@ body.is-scrolling .hero__content {
 }
 
 /* Option B: Split-screen ivory #F5F1E8 layout with scroll-revealed facts
-   and construction video (Option A preserved in DOM when data-about-opt="a") */
+   and construction video that slides in from the right (Option A preserved in DOM when data-about-opt="a") */
 .about__split {
   position: absolute;
   inset: 0;
+  z-index: 10;
+  background: #F5F1E8;
+  box-shadow: -28px 0 64px -20px rgba(0, 0, 0, 0.55);
   pointer-events: none;
   overflow: hidden;
+  will-change: transform;
 }
 
 .about[data-about-opt="a"] .about__split {
@@ -4921,7 +5028,7 @@ body.is-scrolling .hero__content {
 
 .about__split-qa {
   position: absolute;
-  top: clamp(120px, 16vh, 195px);
+  top: clamp(96px, 14vh, 185px);
   left: 5.5vw;
   max-width: min(39vw, 660px);
   will-change: transform, opacity;
@@ -4951,7 +5058,7 @@ body.is-scrolling .hero__content {
 .about__split-facts-wrap {
   position: absolute;
   left: 5.5vw;
-  bottom: clamp(48px, 10.5vh, 130px);
+  bottom: clamp(36px, 8.5vh, 120px);
 }
 
 .about__split-facts-head {
@@ -4970,7 +5077,7 @@ body.is-scrolling .hero__content {
 }
 
 .about__split-facts li {
-  font: 400 clamp(1.35rem, 2.65vw, 3.3rem) / 1.38 var(--f-display);
+  font: 400 clamp(1.25rem, min(2.5vw, 3.8vh), 3.1rem) / 1.35 var(--f-display);
   letter-spacing: 0.015em;
   text-transform: uppercase;
   color: #424242;
@@ -5030,27 +5137,27 @@ body.is-scrolling .hero__content {
 
 @media (max-width: 760px) {
   .about__split-qa {
-    top: 84px;
+    top: calc(var(--bar-h) + 10px);
     left: 6vw;
     right: 6vw;
     max-width: none;
   }
 
   .about__split-q {
-    font-size: clamp(1.05rem, 4.4vw, 1.35rem);
+    font-size: clamp(0.98rem, 4.1vw, 1.25rem);
   }
 
   .about__split-a {
-    font-size: clamp(0.9rem, 3.6vw, 1.08rem);
+    font-size: clamp(0.85rem, 3.4vw, 1.02rem);
   }
 
   .about__split-media {
     right: 0;
     left: 0;
-    top: 25vh;
+    top: 27svh;
     bottom: auto;
     width: 100vw;
-    height: 40vh;
+    height: 34svh;
   }
 
   .about__video {
@@ -5060,12 +5167,12 @@ body.is-scrolling .hero__content {
   .about__split-facts-wrap {
     left: 6vw;
     right: 6vw;
-    bottom: clamp(48px, 8.5svh, 90px);
+    bottom: clamp(60px, 9.5svh, 92px);
   }
 
   .about__split-facts-head {
-    margin-bottom: 8px;
-    font-size: clamp(0.96rem, 4vw, 1.08rem);
+    margin-bottom: 6px;
+    font-size: clamp(0.88rem, 3.6vw, 1.02rem);
   }
 
   .about__split-facts {
@@ -5073,8 +5180,8 @@ body.is-scrolling .hero__content {
   }
 
   .about__split-facts li {
-    font-size: clamp(1.3rem, 5.6vw, 1.74rem);
-    line-height: 1.34;
+    font-size: clamp(1.05rem, 4.6vw, 1.45rem);
+    line-height: 1.3;
   }
 }
 
@@ -5674,6 +5781,7 @@ body.is-scrolling .hero__content {
 
 /* Gatehouse: full width at the foot of the section */
 .enquire__gate {
+  margin-top: clamp(-14rem, -18vw, -6rem);
   line-height: 0;
 }
 
@@ -5708,13 +5816,17 @@ body.is-scrolling .hero__content {
   .enquire__ctas .btn {
     flex: 1 1 100%;
   }
+
+  .enquire__gate {
+    margin-top: clamp(-4.5rem, -14vw, -2.5rem);
+  }
 }
 
 /* Footer */
 .footer {
   position: relative;
   z-index: 12;
-  padding: clamp(3.5rem, 6vw, 6rem) var(--gutter) 2rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem) var(--gutter) 2rem;
   background: #F5F1E8;
   color: var(--ink);
 }
@@ -5859,6 +5971,7 @@ body.is-scrolling .hero__content {
     margin: 0 auto;
   }
 }
+
 /* =====================================================================
    Refinements (v150): clearer offer, calmer type, shorter pinned
    sequences and practical plot, location and project information,
@@ -5884,7 +5997,7 @@ body.is-scrolling .hero__content {
 }
 
 .amen__q {
-  font-size: calc(clamp(1.9rem, 4.4vw, 4.4rem) - 8px);
+  font-size: clamp(1.05rem, calc(4.4vw - 38px), calc(4.4rem - 38px));
 }
 
 .conn__title {
@@ -5941,11 +6054,7 @@ body.is-scrolling .hero__content {
 
 @media (min-width: 901px) {
   .hero__base {
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .hero__scroll {
-    justify-self: center;
+    grid-template-columns: 1fr auto;
   }
 }
 
@@ -6186,8 +6295,8 @@ body.is-scrolling .hero__content {
 /* ---------- Amenities by category ---------- */
 .amen-list {
   position: relative;
-  width: min(92vw, 1280px);
-  margin: clamp(3rem, 9vh, 6rem) auto 0;
+  width: min(94vw, 1460px);
+  margin: clamp(8rem, 18vh, 13rem) auto 0;
   color: #F5F1E8;
   text-align: left;
 }
@@ -6246,35 +6355,85 @@ body.is-scrolling .hero__content {
   color: #fff;
 }
 
-.amen-key {
+.amen-carousel {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin: 1.1rem 0 1.6rem;
-  padding: 0;
-  list-style: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.15rem;
+  margin-top: 1.5rem;
+}
+
+.amen-carousel__viewport {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 6px 0;
+}
+
+.amen-carousel__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.amen-carousel__btn {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(245, 241, 232, 0.45);
+  background: rgba(38, 59, 29, 0.72);
+  color: #F5F1E8;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s, opacity 0.3s;
+}
+
+.amen-carousel__btn:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+}
+
+.amen-carousel__btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
 }
 
 .agrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
-  align-content: start;
+  --amen-cols: 3;
+  --amen-gap: clamp(1rem, 1.8vw, 1.5rem);
+  display: flex;
   align-items: stretch;
-  gap: clamp(0.9rem, 1.6vw, 1.4rem);
+  gap: var(--amen-gap);
   margin: 0;
   padding: 0;
   list-style: none;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (max-width: 1120px) {
+  .agrid {
+    --amen-cols: 2;
+  }
 }
 
 .agrid__card {
   position: relative;
+  flex: 0 0 calc((100% - (var(--amen-cols) - 1) * var(--amen-gap)) / var(--amen-cols));
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: #F5F1E8;
   color: #484848;
-  box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.6);
+  box-shadow: none;
   isolation: isolate;
-  transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+  transition: transform 0.5s var(--ease-out);
 }
 
 .agrid__card[hidden] {
@@ -6283,7 +6442,6 @@ body.is-scrolling .hero__content {
 
 .agrid__card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 36px 60px -26px rgba(0, 0, 0, 0.7);
 }
 
 .agrid__card::after {
@@ -6297,14 +6455,17 @@ body.is-scrolling .hero__content {
 }
 
 .agrid__photo {
-  margin: 10px 10px 0;
+  flex: 1 1 auto;
+  display: flex;
+  margin: 12px 12px 0;
   overflow: hidden;
 }
 
 .agrid__photo img {
   width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
+  height: 100%;
+  aspect-ratio: 4 / 4.2;
+  max-height: clamp(220px, calc(100svh - 310px), 460px);
   object-fit: cover;
   transition: transform 1.2s var(--ease-out);
 }
@@ -6314,28 +6475,24 @@ body.is-scrolling .hero__content {
 }
 
 .agrid__body {
-  flex: 1;
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: 0.4rem;
-  padding: 0.9rem 1.1rem 1.2rem;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 1.05rem 1rem;
 }
 
-/* Every card the same size: room for two lines of title and two of description */
 .agrid__title {
-  min-height: 2.5em;
-  margin: 0.15rem 0 0;
-  font: 400 clamp(1.1rem, 1.3vw, 1.3rem) / 1.25 var(--f-display);
+  margin: 0;
+  font: 400 clamp(1.1rem, 1.3vw, 1.35rem) / 1.2 var(--f-display);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--navy-900);
 }
 
 .agrid__desc {
-  min-height: 3em;
   margin: 0;
-  font: 400 0.95rem / 1.5 var(--f-ui);
+  font: 400 0.95rem / 1.4 var(--f-ui);
 }
 
 .amen-list__note {
@@ -6511,8 +6668,8 @@ body.is-scrolling .hero__content {
   background-color: var(--navy-900);
 }
 
-.conn .loc-info__side > .loc-info__h,
-.conn .loc-info__side > .loc-info__fine,
+.conn .loc-info__side>.loc-info__h,
+.conn .loc-info__side>.loc-info__fine,
 .conn .loc-info__open {
   transition: color 0.7s var(--ease-out), border-color 0.7s var(--ease-out);
 }
@@ -6789,10 +6946,15 @@ body.is-scrolling .hero__content {
 
 /* ---------- FAQ: a standard accordion in the Q-strip style ---------- */
 .faq {
+  margin-top: 0;
   height: auto;
-  min-height: 100vh;
+  min-height: 0;
   overflow: visible;
-  padding-bottom: clamp(4rem, 8vw, 7rem);
+  padding-bottom: clamp(1rem, 2.5vw, 2rem);
+}
+
+.enquire {
+  padding-top: clamp(1rem, 2.5vw, 2rem);
 }
 
 .faq__title {
@@ -6979,6 +7141,7 @@ body.is-scrolling .hero__content {
 
 /* ---------- Tablet ---------- */
 @media (max-width: 1024px) {
+
   .loc-info__grid,
   .proj__grid {
     grid-template-columns: 1fr;
@@ -7108,9 +7271,18 @@ body.is-scrolling .hero__content {
     padding: 0 0.3rem;
   }
 
+  .amen-carousel {
+    gap: 0.5rem;
+  }
+
+  .amen-carousel__btn {
+    width: 38px;
+    height: 38px;
+  }
+
   .agrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.7rem;
+    --amen-cols: 1;
+    --amen-gap: 0.7rem;
   }
 
   .agrid__photo {
@@ -7214,7 +7386,7 @@ body.is-scrolling .hero__content {
   color: #E9C46F;
 }
 
-.proj .photos > .loc-info__h,
+.proj .photos>.loc-info__h,
 .proj .photos__grid figcaption {
   color: #F5F1E8;
 }
@@ -7440,7 +7612,7 @@ body.is-scrolling .hero__content {
   margin-top: clamp(2rem, 4vw, 3rem);
 }
 
-.loc-info .photos > .loc-info__h,
+.loc-info .photos>.loc-info__h,
 .loc-info .photos__grid figcaption {
   color: #F5F1E8;
 }

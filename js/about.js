@@ -31,6 +31,7 @@
   const lines = [...linesBox.querySelectorAll('.about__line')];
   const deck = section.querySelector('.about__deck');
   const cards = [...section.querySelectorAll('.about__card')];
+  const split = section.querySelector('.about__split');
   const splitQa = section.querySelector('.about__split-qa');
   const splitFactsHead = section.querySelector('.about__split-facts-head');
   const splitFacts = [...section.querySelectorAll('.about__split-facts li')];
@@ -246,17 +247,18 @@
     gsap.set(c, { ...slot(i), rotation: 0 });
   });
   gsap.set(head, { xPercent: -50, yPercent: -50 });
-  // The title is already in place as About slides up over Location (js/sections.js)
+  // The title is already in place as About continues on the navy background
   gsap.set(title, { opacity: 1, scale: 1, filter: 'blur(0px)' });
   gsap.set(sketch, { xPercent: -50, yPercent: -50, y: () => vh() * 0.525 + sketch.offsetHeight / 2 + 40, rotation: 0 });
   gsap.set(sketches[0], { opacity: 1 });
   gsap.set(linesBox, { xPercent: -50, y: 0 });
   gsap.set(lines, { opacity: 0, y: 24 });
   gsap.set(bg, { opacity: 1, scale: 1.08 });
-  if (splitQa) gsap.set(splitQa, { opacity: 0, y: 64 });
-  if (splitFactsHead) gsap.set(splitFactsHead, { opacity: 0, y: 40 });
-  if (splitFacts.length) gsap.set(splitFacts, { opacity: 0, y: 36 });
-  if (video) gsap.set(video, { opacity: 0 });
+  if (split) gsap.set(split, { xPercent: 100 });
+  if (splitQa) gsap.set(splitQa, { opacity: 1, y: 0 });
+  if (splitFactsHead) gsap.set(splitFactsHead, { opacity: 1, y: 0 });
+  if (splitFacts.length) gsap.set(splitFacts, { opacity: 0, x: 48, y: 0 });
+  if (video) gsap.set(video, { opacity: 1 });
   if (blurLayer) gsap.set(blurLayer, { opacity: 0 });
   gsap.set(env, { y: () => vh() * 0.4 });
   gsap.set(flap, { rotationX: -180 });
@@ -311,18 +313,14 @@
     .to(sketches[2], { opacity: 1, duration: 0.9 }, 'l2')
     .to({}, { duration: 0.2 })
 
-    // Title, sketch and lines slide upward smoothly as the stage transitions;
-    // Ink bleeds open (Option A) OR video/3D fades in and Q&A slides up (Options B & C)
+    // The ivory question & track-record section (.about__split) slides in from the right
+    // over the navy stage
     .addLabel('ink')
     .to(ink, { p: 1, duration: 1.8, ease: 'power1.in', onUpdate: () => { inkProgress = ink.p; drawInk(); } }, 'ink')
     .to(bg, { scale: 1, duration: 2, ease: 'power1.out' }, 'ink')
     .to(paper, { opacity: 0, duration: 1.15, ease: 'power1.inOut' }, 'ink')
-    .to(head, { y: () => titleTopY() - vh() * 0.42, opacity: 0, duration: 1.15, ease: 'power2.inOut' }, 'ink')
-    .to(sketch, { y: () => sketchRestY - vh() * 0.48, opacity: 0, duration: 1.15, ease: 'power2.inOut' }, 'ink+=0.06')
-    .to(linesBox, { y: () => -vh() * 0.45, opacity: 0, duration: 1.15, ease: 'power2.inOut' }, 'ink+=0.12')
-    .to(video, { opacity: 1, duration: 1.05, ease: 'power2.out' }, 'ink+=0.6')
-    .to(splitQa, { opacity: 1, y: 0, duration: 1.05, ease: 'power3.out' }, 'ink+=0.85')
-    .to(splitFactsHead, { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' }, 'ink+=1.35')
+    .to(split, { xPercent: 0, duration: 1.45, ease: 'power2.inOut' }, 'ink')
+    .to([head, sketch, linesBox], { x: () => -window.innerWidth * 0.18, opacity: 0, duration: 1.25, ease: 'power2.inOut' }, 'ink')
 
     // The stack rises from below and lands in the centre (Option A)
     .to(deck, { y: 0, duration: 1.2, ease: 'power3.out' }, 'ink+=1.6')
@@ -330,8 +328,8 @@
     .to({}, { duration: 0.2 });
 
   // Each card in turn lifts off the top with a slight tilt (Option A);
-  // Meanwhile in Options B & C, each of the 4 bullet facts appears one after another
-  // as the construction video / 3D house builds from foundation to completion
+  // Meanwhile in Option B, each of the 4 bullet facts slides in from the right
+  // as the construction video builds from foundation to completion
   cards.forEach((card, k) => {
     const at = `card${k}`;
     const tilt = k % 2 ? 6 : -6;
@@ -343,7 +341,7 @@
     });
     // Reveal the 4 facts one after another across card0..card3
     if (k < splitFacts.length) {
-      tl.to(splitFacts[k], { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' }, `${at}+=0.1`);
+      tl.to(splitFacts[k], { opacity: 1, x: 0, y: 0, duration: 0.85, ease: 'power2.out' }, `${at}+=0.1`);
     }
     if (k < N - 1) tl.to({}, { duration: 0.1 });
   });
@@ -385,9 +383,7 @@
     // The letter lifts off the top of the screen at a -10 degree tilt as the envelope drops away
     .addLabel('leave')
     .to(letter, { yPercent: -340, rotation: -10, duration: 1.4, ease: 'power2.in' }, 'leave')
-    .to(env, { y: () => vh() * 0.5, duration: 1.4, ease: 'power2.in' }, 'leave+=0.2')
-    // the FAQ slides up over this last stretch (one screen), as the letter leaves
-    .to({}, { duration: 2.4 });
+    .to(env, { y: () => vh() * 0.5, duration: 1.4, ease: 'power2.in' }, 'leave+=0.2');
 
   // ---- Option A / B / C Switcher ----
   const setOption = (opt, scrollIfOutside = false) => {

@@ -202,7 +202,7 @@
     toggleLabel.textContent = paused ? 'Play' : 'Pause';
   };
   toggle.addEventListener('click', () => {
-    if (video.paused) { video.play().catch(() => {}); setPaused(false); }
+    if (video.paused) { video.play().catch(() => { }); setPaused(false); }
     else { video.pause(); setPaused(true); }
   });
   let userPaused = false;
@@ -217,13 +217,13 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([en]) => {
         if (userPaused) return;
-        if (en.isIntersecting) video.play().catch(() => {});
+        if (en.isIntersecting) video.play().catch(() => { });
         else video.pause();
       }).observe(video);
     }
   }
 
-/* ---------- Dialog helpers (animated open/close) ---------- */
+  /* ---------- Dialog helpers (animated open/close) ---------- */
   const openDialog = (dlg) => {
     lenis && lenis.stop();
     dlg.showModal();
@@ -236,7 +236,7 @@
     if (reduceMotion.matches) done();
     else setTimeout(done, dlg.id === 'menuDialog' ? 650 : 380);
   };
-  [ 'menuDialog', 'bookingDialog' ].forEach((id) => {
+  ['menuDialog', 'bookingDialog'].forEach((id) => {
     const dlg = document.getElementById(id);
     dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeDialog(dlg); });
   });
@@ -480,7 +480,7 @@
 
     tl
       // Phase 1: Hero copy is gone by the time the ink is ~50-60% across (progress 0 -> 0.17)
-      .to([heroContent, heroBase], { opacity: 0, y: -24, duration: 0.17, ease: 'power1.in' }, 0)
+      .fromTo([heroContent, heroBase], { opacity: 1, y: 0 }, { opacity: 0, y: -24, duration: 0.17, ease: 'power1.in', immediateRender: false }, 0)
 
       // Phase 2: Ivory ink bleeds over the video (progress 0 -> 0.34)
       .to(inkTracker, {
@@ -689,9 +689,17 @@
           ease: 'power2.inOut',
         }, 'mp')
         .to(mplanLabel, { opacity: 0, duration: 0.5, ease: 'power1.in' }, 'mp+=0.5')
-        .to([pillars, pillarsTitle], {
+        .to(pillars, {
           x: () => (isPh() ? 0 : -window.innerWidth * 0.6),
           y: () => (isPh() ? -window.innerHeight * 0.5 : 0),
+          opacity: 0,
+          filter: 'blur(6px)',
+          duration: 1.4,
+          ease: 'power2.inOut',
+        }, 'mp')
+        .to(pillarsTitle, {
+          x: () => (isPh() ? 0 : -window.innerWidth * 0.6),
+          y: () => (isPh() ? titleLift() - window.innerHeight * 0.5 : titleLift()),
           opacity: 0,
           filter: 'blur(6px)',
           duration: 1.4,
@@ -739,7 +747,7 @@
        zoom    - a selected plot zoomed in, details popup above it */
   function initExplorer({ mplan, mplanImg, stage, card, openBooking, roadX, introY, roadScale }) {
     const data = window.MJR_PLOTS;
-    if (!data) return { reset() {} };
+    if (!data) return { reset() { } };
     const pinsEl = document.getElementById('planPins');
     const grid = document.getElementById('plotGrid');
     const pop = document.getElementById('plotPop');
@@ -1311,16 +1319,18 @@
       // left they turn on to a plain white back (swapped at the edge-on moment,
       // so the number never shows mirrored); then they all fade out together
       gsap.set(tiles, { rotationY: -90, opacity: 0 });
-      const tl = gsap.timeline({ onComplete: () => {
-        mplan.classList.remove('is-teasing');
-        if (!card.classList.contains('is-flipped')) exploreBtn.classList.add('is-glowing');
-        // wait for the pin layer to fade away before restoring the tiles
-        setTimeout(() => {
-          tiles.forEach((t) => t.classList.remove('is-back'));
-          gsap.set(tiles, { clearProps: 'transform,opacity' });
-          updatePins();
-        }, 600);
-      } });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          mplan.classList.remove('is-teasing');
+          if (!card.classList.contains('is-flipped')) exploreBtn.classList.add('is-glowing');
+          // wait for the pin layer to fade away before restoring the tiles
+          setTimeout(() => {
+            tiles.forEach((t) => t.classList.remove('is-back'));
+            gsap.set(tiles, { clearProps: 'transform,opacity' });
+            updatePins();
+          }, 600);
+        }
+      });
       const STEP = 0.07;
       const last = cols.length - 1;
       const backAt = 0.3 + last * STEP + 0.35 + 0.6; // after every tile shows its number, plus a hold

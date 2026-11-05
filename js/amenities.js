@@ -84,9 +84,16 @@
     return nc - head.offsetTop;
   };
 
-  // Column offset with the grid's last row resting above the bottom edge
-  // (clear of the phone action bar)
-  const listEndY = () => vh() - (isPhone() ? 96 : 56) - (list.offsetTop + list.offsetHeight);
+  // Column offset with the carousel centered in the viewport below the nav bar
+  const listEndY = () => {
+    const nc = navClear();
+    const bottomPad = isPhone() ? 72 : Math.min(48, Math.max(20, vh() * 0.04));
+    const availH = vh() - nc - bottomPad;
+    const targetTop = availH >= list.offsetHeight
+      ? nc + (availH - list.offsetHeight) / 2
+      : Math.max(nc - 10, vh() - bottomPad - list.offsetHeight);
+    return targetTop - list.offsetTop;
+  };
   const gridY = () => Math.min(settleY(), listEndY());
   // Screens of scroll for the grid to rise in: about one per screen of travel
   const gridScreens = () => Math.max(0.8, (settleY() - gridY()) / vh());
@@ -129,13 +136,13 @@
     .to(shape, { left: '0%', width: '100%', height: '100%', y: 0, duration: 1.2 }, 'open')
     .fromTo(bldgs[0],
       { left: '0%', width: '30.68%', '--t1': () => (logoH() * 0.4404).toFixed(1) + 'px', '--t2': () => (logoH() * 0.2301).toFixed(1) + 'px' },
-      { left: '0%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
+      { left: '0%', width: '33.6%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
     .fromTo(bldgs[1],
       { left: '34.64%', width: '30.72%', '--t1': () => (logoH() * 0.2092).toFixed(1) + 'px', '--t2': '0px' },
-      { left: '33.3%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
+      { left: '33.2%', width: '33.6%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
     .fromTo(bldgs[2],
       { left: '69.32%', width: '30.68%', '--t1': () => (logoH() * 0.3003).toFixed(1) + 'px', '--t2': () => (logoH() * 0.6043).toFixed(1) + 'px' },
-      { left: '66.6%', width: '33.4%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
+      { left: '66.4%', width: '33.6%', '--t1': '0px', '--t2': '0px', duration: 1.2 }, 'open')
     .to(navy, { opacity: 1, duration: 0.5, ease: 'none' }, 'open+=0.8');
 
   const tl = gsap.timeline({
@@ -183,9 +190,40 @@
     // 4. The column scrolls on: heading, photo and caption leave the top and
     //    the amenity grid rises into view
     .addLabel('grid')
+    .to([head, frame, copy], { opacity: 0, duration: 0.9 * gridScreens(), ease: 'power1.inOut' }, 'grid')
     .to([track, navy], { y: gridY, duration: 2.2 * gridScreens(), ease: 'none' }, 'grid')
     .addLabel('gridIn')
     .to({}, { duration: 0.8 });
+
+  let lastClientX = -9999;
+  let lastClientY = -9999;
+  const updatePatternPointer = () => {
+    if (lastClientX < -1000) return;
+    const rect = navy.getBoundingClientRect();
+    navy.style.setProperty('--mx', (lastClientX - rect.left).toFixed(1) + 'px');
+    navy.style.setProperty('--my', (lastClientY - rect.top).toFixed(1) + 'px');
+    bldgs.forEach((b) => {
+      const br = b.getBoundingClientRect();
+      b.style.setProperty('--mx', (lastClientX - br.left).toFixed(1) + 'px');
+      b.style.setProperty('--my', (lastClientY - br.top).toFixed(1) + 'px');
+    });
+  };
+  window.addEventListener('pointermove', (e) => {
+    lastClientX = e.clientX;
+    lastClientY = e.clientY;
+    updatePatternPointer();
+  }, { passive: true });
+  window.addEventListener('scroll', updatePatternPointer, { passive: true });
+  document.addEventListener('mouseleave', () => {
+    lastClientX = -9999;
+    lastClientY = -9999;
+    navy.style.setProperty('--mx', '-9999px');
+    navy.style.setProperty('--my', '-9999px');
+    bldgs.forEach((b) => {
+      b.style.setProperty('--mx', '-9999px');
+      b.style.setProperty('--my', '-9999px');
+    });
+  });
 
   window.addEventListener('load', () => ScrollTrigger.refresh());
 })();
