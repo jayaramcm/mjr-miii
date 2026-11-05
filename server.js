@@ -1,6 +1,9 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
+
+const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg']);
 
 const PORT = process.env.PORT || 3000;
 const BASE_DIR = __dirname;
@@ -160,15 +163,28 @@ const server = http.createServer((req, res) => {
       });
       fileStream.pipe(res);
     } else {
-      res.writeHead(200, {
-        'Content-Length': totalSize,
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        // Pages, styles and scripts are always re-checked, so edits show on a normal reload
-        ...(['.html', '.css', '.js'].includes(ext) ? { 'Cache-Control': 'no-cache' } : {}),
-        'Access-Control-Allow-Origin': '*'
-      });
-      fs.createReadStream(safePath).pipe(res);
+      const isCode = ['.html', '.css', '.js'].includes(ext);
+      const cacheHeader = isCode ? 'no-cache' : 'public, max-age=604800';
+      const acceptEncoding = req.headers['accept-encoding'] || '';
+      if (COMPRESSIBLE.has(ext) && /\bgzip\b/.test(acceptEncoding)) {
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Encoding': 'gzip',
+          'Vary': 'Accept-Encoding',
+          'Cache-Control': cacheHeader,
+          'Access-Control-Allow-Origin': '*'
+        });
+        fs.createReadStream(safePath).pipe(zlib.createGzip()).pipe(res);
+      } else {
+        res.writeHead(200, {
+          'Content-Length': totalSize,
+          'Content-Type': contentType,
+          'Accept-Ranges': 'bytes',
+          'Cache-Control': cacheHeader,
+          'Access-Control-Allow-Origin': '*'
+        });
+        fs.createReadStream(safePath).pipe(res);
+      }
     }
   });
 });

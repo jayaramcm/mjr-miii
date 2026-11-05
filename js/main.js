@@ -63,9 +63,9 @@
      and every jump from the menu: it fades in, the page jumps underneath while
      it is covered, the scrubbed timelines catch up, then it fades out. */
   const loader = document.getElementById('preloader');
-  const LOADER_MIN = 1000;
-  const LOADER_FADE = 700;
-  const SETTLE = 1200; // scrub: 1 needs about a second to catch up after a jump
+  const LOADER_MIN = 550;
+  const LOADER_FADE = 600;
+  const SETTLE = 1000; // scrub: 1 needs about a second to catch up after a jump
   const hideLoader = () => {
     loader.classList.add('is-done');
     loader.setAttribute('aria-hidden', 'true');
@@ -96,9 +96,9 @@
       start();
     }, Math.max(0, LOADER_MIN - (performance.now() - pageStart)));
   };
-  if (document.readyState === 'complete') firstReveal();
-  else window.addEventListener('load', firstReveal, { once: true });
-  setTimeout(firstReveal, 3500); // never hold the page hostage to a slow asset
+  if (document.readyState !== 'loading') firstReveal();
+  else document.addEventListener('DOMContentLoaded', firstReveal, { once: true });
+  setTimeout(firstReveal, 1200); // never hold the page hostage to a slow asset
 
   /* ---------- Ink bleed (Cartier-style scroll transition) ----------
      Ivory blots open from staggered seeds, grow and merge until the frame
@@ -183,7 +183,8 @@
     }
   };
   const sketch = new Image();
-  sketch.src = 'Assets/Architectural Sketch of MJR Gate Entrance.png';
+  sketch.decoding = 'async';
+  sketch.src = 'Assets/web/architectural-sketch-gate-entrance.webp';
 
   /* ---------- Scroll & ink sizing ---------- */
   let scrollTimer;

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="Assets/web/hero-poster.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=200">
+  <link rel="stylesheet" href="css/styles.css?v=201">
 </head>
 <body>
   <!-- Preloader: the MJR mark builds itself. Shown on first load and between
@@ -172,8 +172,8 @@
       <!-- Intro sequence inside the hero stage so it triggers immediately when ink fade is done -->
       <div class="intro" id="intro" aria-labelledby="introTitle">
         <figure class="intro__photo">
-          <img class="intro__sketch" src="Assets/Architectural Sketch of MJR Gate Entrance.png" alt="" aria-hidden="true" decoding="async">
-          <img class="intro__color" src="Assets/entrance-mjr.jpg" alt="The landscaped entrance to MJR Township, Kalwakurthy" decoding="async">
+          <img class="intro__sketch" src="Assets/web/architectural-sketch-gate-entrance.webp" alt="" aria-hidden="true" decoding="async">
+          <img class="intro__color" src="Assets/web/entrance-mjr.webp" alt="The landscaped entrance to MJR Township, Kalwakurthy" decoding="async">
           <div class="intro__overlay" aria-hidden="true" data-nav="navy"></div>
         </figure>
         <h2 class="intro__word" id="introTitle">
@@ -198,9 +198,9 @@
       <div class="why__track">
         <div class="why__panel why__panel--intro">
           <div class="why__scene" aria-hidden="true">
-            <img class="why__art why__art--palm" src="Assets/Tropical Gazebo Garden Cutout 1.png" alt="" decoding="async">
-            <img class="why__art why__art--gazebo" src="Assets/Tropical Garden Pavilion with Water Tower 1.png" alt="" decoding="async">
-            <img class="why__art why__art--tower" src="Assets/Tropical Garden Water Tower Scene.png" alt="" decoding="async">
+            <img class="why__art why__art--palm" src="Assets/web/tropical-gazebo-garden-cutout-1.webp" alt="" loading="lazy" decoding="async">
+            <img class="why__art why__art--gazebo" src="Assets/web/tropical-garden-pavilion-with-water-tower-1.webp" alt="" loading="lazy" decoding="async">
+            <img class="why__art why__art--tower" src="Assets/web/tropical-garden-water-tower-scene.webp" alt="" loading="lazy" decoding="async">
           </div>
           <div class="why__copy">
             <h2 class="why__title" id="why-h">Make your next move count</h2>
@@ -215,32 +215,32 @@
           </div>
           <ul class="pillars">
             <li class="pillar">
-              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/web/ornate-marble-corinthian-column.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
               <span class="pillar__shadow" aria-hidden="true"></span>
               <div class="pillar__copy"><h3>Own</h3><p>A RERA-registered plot you can verify before you buy.</p><p class="pillar__fact">TG RERA P01600010465</p></div>
             </li>
             <li class="pillar">
-              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/web/ornate-marble-corinthian-column.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
               <span class="pillar__shadow" aria-hidden="true"></span>
               <div class="pillar__copy"><h3>Build</h3><p>A size for your plans, on planned road widths.</p><p class="pillar__fact">120&ndash;550 sq. yd. &middot; 30 &amp; 40 ft roads</p></div>
             </li>
             <li class="pillar">
-              <img class="pillar__img" src="Assets/Ornate Marble Corinthian Column.png" alt="" aria-hidden="true" decoding="async">
+              <img class="pillar__img" src="Assets/web/ornate-marble-corinthian-column.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
               <span class="pillar__shadow" aria-hidden="true"></span>
               <div class="pillar__copy"><h3>Belong</h3><p>A gated community with parks and amenities for every age.</p><p class="pillar__fact">104 plots &middot; 7.93 acres* on NH 167K</p></div>
             </li>
           </ul>
           <div class="mplan" id="mplan">
             <!-- Grass ground: fills the frame and only eases in a little when a plot is selected (js/main.js) -->
-            <img class="mplan__img" src="Assets/Lush Grassland Garden Clusters.png" alt="" aria-hidden="true" decoding="async">
+            <img class="mplan__img" src="Assets/web/lush-grassland-garden-clusters.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
             <div class="mplan__stage" id="planStage">
-              <img class="mplan__plan" src="Assets/plots layout.svg?v=1" alt="MJR Township master layout: 104 plots in blocks between the internal roads, with the green and water zones, facing the 150 ft main road" decoding="async">
+              <img class="mplan__plan" src="Assets/plots layout.svg?v=1" alt="MJR Township master layout: 104 plots in blocks between the internal roads, with the green and water zones, facing the 150 ft main road" loading="lazy" decoding="async">
               <!-- Fill of the selected plot, traced from plots layout.svg (1920 x 1441 frame) -->
               <svg class="mplan__shape" viewBox="0 0 1920 1441" preserveAspectRatio="none" aria-hidden="true" focusable="false">
                 <polygon id="planShape" points=""></polygon>
               </svg>
               <!-- Bushes and roads overlay layer on top of the selected plot fill -->
-              <img class="mplan__roads" src="Assets/Triangular Garden Road Network 2.png?v=1" alt="" aria-hidden="true" decoding="async">
+              <img class="mplan__roads" src="Assets/web/triangular-garden-road-network-2.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
             </div>
             <div class="mplan__pins" id="planPins" aria-label="Plots on the master plan"></div>
 
@@ -630,7 +630,7 @@
            pushed to the left by the destination image pane; each subsequent image opens from bottom-right -->
       <div class="conn__stage">
         <div class="conn__scene">
-          <img class="conn__intro-img" src="Assets/MJR Luxury Township Entrance and Mountains.png" alt="MJR Township entrance with mountains in the background" decoding="async">
+          <img class="conn__intro-img" src="Assets/web/mjr-luxury-township-entrance-mountains.webp" alt="MJR Township entrance with mountains in the background" loading="lazy" decoding="async">
 
           <aside class="conn__sidebar" id="connSidebar" aria-label="Connectivity highlights">
             <div class="conn__acc">
@@ -689,10 +689,10 @@
           </aside>
 
           <div class="conn__gallery" id="connGallery">
-            <img class="conn__dest-img" src="Assets/Modern Tech District and Airport Skyline.png" alt="To Hyderabad — Financial District, Gachibowli and Rajiv Gandhi International Airport skyline" loading="lazy" decoding="async">
-            <img class="conn__dest-img" src="Assets/Aerial Campus Panorama with Flags.png" alt="Education nearby — university and school campuses" loading="lazy" decoding="async">
-            <img class="conn__dest-img" src="Assets/Modern Hospital Campus in a Lush Cityscape.png" alt="Healthcare nearby — modern hospital campus" loading="lazy" decoding="async">
-            <img class="conn__dest-img" src="Assets/Temples, Reservoirs and Buddha Vista.png" alt="Around Kalwakurthy — temples, reservoirs and Gautama Buddha statue" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/web/modern-tech-district-airport-skyline.webp" alt="To Hyderabad — Financial District, Gachibowli and Rajiv Gandhi International Airport skyline" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/web/aerial-campus-panorama-flags.webp" alt="Education nearby — university and school campuses" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/web/modern-hospital-campus-cityscape.webp" alt="Healthcare nearby — modern hospital campus" loading="lazy" decoding="async">
+            <img class="conn__dest-img" src="Assets/web/temples-reservoirs-buddha-vista.webp" alt="Around Kalwakurthy — temples, reservoirs and Gautama Buddha statue" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -770,49 +770,20 @@
 
     <!-- 12. About: the team behind the foundation -->
     <section class="about" id="about" aria-labelledby="aboutTitle" data-about-opt="b">
-      <!-- Pinned stage: title blurs in on cream, moves up as the layout sketches
-           slide in and turn, with the two lines below; then the aerial view fades
-           in, a stack of cards lands in the centre and each scroll sends the top
-           card up as the view eases in; then the leadership letter (js/about.js) -->
       <div class="about__stage">
-        <img class="about__paper" src="Assets/paper-texture-2.png" alt="" aria-hidden="true" decoding="async">
-        <img class="about__bg" src="Assets/23.png" alt="" aria-hidden="true" decoding="async">
         <div class="about__head">
           <h2 class="about__title" id="aboutTitle">The team behind the foundation.</h2>
         </div>
         <div class="about__sketch" aria-hidden="true">
-          <img src="Assets/outline-sketch-1.png" alt="" decoding="async">
-          <img src="Assets/outline-sketch-2.png" alt="" decoding="async">
-          <img src="Assets/outline-sketch-3.png" alt="" decoding="async">
+          <img src="Assets/web/outline-sketch-1.webp" alt="" loading="lazy" decoding="async">
+          <img src="Assets/web/outline-sketch-2.webp" alt="" loading="lazy" decoding="async">
+          <img src="Assets/web/outline-sketch-3.webp" alt="" loading="lazy" decoding="async">
         </div>
         <div class="about__lines">
           <p class="about__line">MJR Infra Developers believes good land deserves careful planning.</p>
           <p class="about__line about__line--strong">Every layout begins with a simple question</p>
         </div>
-        <div class="about__deck">
-          <article class="about__card">
-            <p class="about__q"><span>Q.</span> How will people live here, five and ten years from now?</p>
-            <p class="about__a"><span>A.</span> Roads, open spaces and plot sizes are planned around that answer.</p>
-            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">The Question</span></footer>
-          </article>
-          <article class="about__card">
-            <p class="about__fact">Since 2012</p>
-            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
-          </article>
-          <article class="about__card">
-            <p class="about__fact">12+ Years of experience</p>
-            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
-          </article>
-          <article class="about__card">
-            <p class="about__fact">9 Projects delivered</p>
-            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
-          </article>
-          <article class="about__card">
-            <p class="about__fact">1,200+ Families served</p>
-            <footer class="about__foot"><span class="about__tag">#About MJR</span><span class="about__kind">Our Story</span></footer>
-          </article>
-        </div>
-        <!-- Option B: Plain ivory #F5F1E8 panel that slides in from the right with scroll-revealed facts and construction video -->
+        <!-- Ivory #F5F1E8 panel that slides in from the right with scroll-revealed facts and construction video -->
         <div class="about__split">
           <div class="about__split-copy">
             <div class="about__split-qa">
@@ -836,10 +807,6 @@
           <div class="about__split-media">
             <video class="about__video" id="aboutVideo" src="Assets/construction-video-scrub.mp4" muted playsinline preload="none" poster="Assets/web/construction-poster.jpg" aria-hidden="true"></video>
           </div>
-        </div>
-        <div class="about__opts" role="group" aria-label="Facts layout options" hidden>
-          <button type="button" class="about__opt" data-about-opt="a" aria-pressed="false">Option A</button>
-          <button type="button" class="about__opt is-active" data-about-opt="b" aria-pressed="true">Option B</button>
         </div>
         <div class="about__blur" aria-hidden="true"></div>
         <div class="letter__env">
@@ -945,7 +912,7 @@
       </div>
 
       <div class="enquire__gate">
-        <img src="Assets/Luxury MJR Gatehouse Entrance.png" alt="The MJR Township gatehouse entrance on the highway" loading="lazy" decoding="async">
+        <img src="Assets/web/luxury-mjr-gatehouse-entrance.webp" alt="The MJR Township gatehouse entrance on the highway" loading="lazy" decoding="async">
       </div>
     </section>
   </main>
@@ -1041,10 +1008,10 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="js/site-data.js?v=3" defer></script>
   <script src="js/plots-data.js?v=16" defer></script>
-  <script src="js/main.js?v=93" defer></script>
+  <script src="js/main.js?v=94" defer></script>
   <script src="js/amenities.js?v=49" defer></script>
-  <script src="js/connectivity.js?v=34" defer></script>
-  <script src="js/about.js?v=54" defer></script>
+  <script src="js/connectivity.js?v=35" defer></script>
+  <script src="js/about.js?v=55" defer></script>
   <script src="js/sections.js?v=46" defer></script>
 </body>
 </html>
