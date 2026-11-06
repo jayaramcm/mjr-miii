@@ -4804,8 +4804,8 @@ body.is-scrolling .hero__content {
 
 /* About */
 .about {
-  padding: 0 0 clamp(4rem, 8vw, 8rem);
-  background: var(--navy-900);
+  padding: 0;
+  background: #F5F1E8;
   color: #F5F1E8;
 }
 
@@ -4815,7 +4815,6 @@ body.is-scrolling .hero__content {
 .about__stage {
   position: relative;
   height: 100vh;
-  height: 100svh;
   overflow: hidden;
   background: var(--navy-900);
 }
@@ -7189,30 +7188,45 @@ body.is-scrolling .hero__content {
     font-size: 0.7rem;
   }
 
-  /* Colonnade on phones: three rows, each a capital beside its benefit */
+  /* Colonnade on phones: three rows filling the viewport, alternating left-right-left */
+  .has-why-pin .why__header--pillars {
+    display: none;
+  }
+
   .has-why-pin .pillars {
-    top: 21svh;
-    bottom: auto;
-    width: calc(100vw - 32px);
-    grid-template-columns: 1fr;
-    gap: 0.9rem;
+    top: calc(var(--bar-h) + 2svh);
+    bottom: calc(54px + 3.5svh);
+    width: calc(100vw - 36px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(1.1rem, 2.4svh, 1.8rem);
   }
 
   .has-why-pin .pillar {
     display: grid;
-    grid-template-columns: 26vw 1fr;
+    grid-template-columns: 31vw 1fr;
     align-items: center;
-    gap: 0.9rem;
+    gap: clamp(1.2rem, 4.5vw, 1.6rem);
+  }
+
+  .has-why-pin .pillar:nth-child(2) {
+    grid-template-columns: 1fr 31vw;
   }
 
   .has-why-pin .pillar__img {
     order: -1;
-    width: 26vw;
-    height: 20svh;
+    width: 31vw;
+    height: 24svh;
     max-width: none;
     margin: 0;
     object-fit: cover;
     object-position: 50% 0;
+  }
+
+  .has-why-pin .pillar:nth-child(2) .pillar__img {
+    order: 1;
+    justify-self: end;
   }
 
   .has-why-pin .pillar__copy {
@@ -7222,19 +7236,20 @@ body.is-scrolling .hero__content {
   }
 
   .has-why-pin .pillar__copy h3 {
-    font-size: 1.6rem;
+    font-size: 1.92rem;
   }
 
   .has-why-pin .pillar__copy p {
     max-width: none;
-    margin-top: 0.2rem;
-    font-size: 0.92rem;
+    margin-top: 0.25rem;
+    font-size: 1.1rem;
+    line-height: 1.42;
   }
 
   .pillar__fact {
-    margin-top: 0.4rem !important;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.74rem !important;
+    margin-top: 0.45rem !important;
+    padding: 0.24rem 0.6rem;
+    font-size: 0.89rem !important;
   }
 
   /* availability bar sits under the nav, compact */
