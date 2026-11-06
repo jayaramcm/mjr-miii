@@ -595,11 +595,11 @@
       const roadPullStart = () => roadX() + window.innerWidth * 0.18;
 
       gsap.set(mplan, {
-        clipPath: window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
+        clipPath: 'inset(0% 0% 0% 100%)',
       });
       gsap.set(stage, {
-        x: () => window.innerWidth <= 640 ? roadX() : roadPullStart(),
-        y: () => window.innerWidth <= 640 ? introY() + window.innerHeight * 0.18 : introY(),
+        x: () => roadPullStart(),
+        y: () => introY(),
         scale: roadScale,
         transformOrigin: '0 0',
       });
@@ -670,13 +670,18 @@
 
         // Master plan strip
         .fromTo(mplan, {
-          clipPath: () => window.innerWidth <= 640 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 0% 100%)',
+          clipPath: 'inset(0% 0% 0% 100%)',
         }, {
-          clipPath: () => window.innerWidth <= 640 ? `inset(${STRIP * 100}% 0% 0% 0%)` : `inset(0% 0% 0% ${STRIP * 100}%)`,
+          clipPath: () => `inset(0% 0% 0% ${STRIP * 100}%)`,
           duration: 0.8,
           ease: 'power2.out',
         }, 'ms')
         .fromTo(mplanLabel, { opacity: 0, x: 40, y: 0 }, { opacity: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.out' }, 'ms+=0.2')
+        .to(pillars, {
+          x: () => (isPh() ? -window.innerWidth * 0.16 : 0),
+          duration: 0.8,
+          ease: 'power2.out',
+        }, 'ms')
         .to({}, { duration: 0.3 })
 
         // Pulled open: the strip's edge sweeps across as the plan slides in with it;
@@ -684,23 +689,23 @@
         .to(mplan, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'power2.inOut' }, 'mp')
         .to(stage, { x: roadX, y: introY, scale: roadScale, duration: 1.6, ease: 'power2.inOut' }, 'mp')
         .to(mplanLabel, {
-          x: () => window.innerWidth <= 640 ? 0 : -window.innerWidth * STRIP,
-          y: () => window.innerWidth <= 640 ? -window.innerHeight * STRIP : 0,
+          x: () => -window.innerWidth * STRIP,
+          y: 0,
           duration: 1.6,
           ease: 'power2.inOut',
         }, 'mp')
         .to(mplanLabel, { opacity: 0, duration: 0.5, ease: 'power1.in' }, 'mp+=0.5')
         .to(pillars, {
-          x: () => (isPh() ? 0 : -window.innerWidth * 0.6),
-          y: () => (isPh() ? -window.innerHeight * 0.5 : 0),
+          x: () => (isPh() ? -window.innerWidth * 1.15 : -window.innerWidth * 0.6),
+          y: 0,
           opacity: 0,
           filter: 'blur(6px)',
           duration: 1.4,
           ease: 'power2.inOut',
         }, 'mp')
         .to(pillarsTitle, {
-          x: () => (isPh() ? 0 : -window.innerWidth * 0.6),
-          y: () => (isPh() ? titleLift() - window.innerHeight * 0.5 : titleLift()),
+          x: () => -window.innerWidth * 0.6,
+          y: titleLift,
           opacity: 0,
           filter: 'blur(6px)',
           duration: 1.4,
